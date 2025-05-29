@@ -1,0 +1,2 @@
+# vezirkoprum
+Vezirköprüm MVP rehberi

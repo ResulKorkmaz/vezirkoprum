@@ -1,0 +1,79 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Models\Message;
+use App\Http\Requests\MessageSendRequest;
+use Illuminate\Support\Facades\Auth;
+
+class MessageController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
+    {
+        $user = Auth::user();
+        $messages = Message::where('sender_id', $user->id)
+            ->orWhere('receiver_id', $user->id)
+            ->latest()->get();
+        return view('messages.index', compact('messages'));
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        //
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(MessageSendRequest $request)
+    {
+        $data = $request->validated();
+        $data['sender_id'] = Auth::id();
+        $message = Message::create($data);
+        return redirect()->route('messages.show', $message->id)->with('success', 'Mesaj gönderildi.');
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show($id)
+    {
+        $message = Message::findOrFail($id);
+        $this->authorize('view', $message);
+        if (!$message->is_read && $message->receiver_id === Auth::id()) {
+            $message->update(['is_read' => true]);
+        }
+        return view('messages.show', compact('message'));
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(string $id)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, string $id)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id)
+    {
+        //
+    }
+}

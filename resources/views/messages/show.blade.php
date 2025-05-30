@@ -9,6 +9,7 @@
     <div class="border rounded p-4 mb-6">
         <div class="flex justify-between items-start mb-4">
             <div>
+                <h2 class="text-xl font-semibold mb-2">{{ $message->subject }}</h2>
                 <p class="font-semibold">
                     @if($message->sender_id === auth()->id())
                         Gönderilen: {{ $message->receiver->name }}
@@ -19,7 +20,9 @@
                 <p class="text-sm text-gray-500">{{ $message->created_at->format('d.m.Y H:i') }}</p>
             </div>
         </div>
-        <p class="text-gray-700">{{ $message->body }}</p>
+        <div class="mt-4 p-4 bg-gray-50 rounded">
+            <p class="text-gray-700 whitespace-pre-wrap">{{ $message->content }}</p>
+        </div>
     </div>
 
     @if($message->sender_id !== auth()->id())
@@ -28,9 +31,27 @@
             <form action="{{ route('messages.store') }}" method="POST">
                 @csrf
                 <input type="hidden" name="receiver_id" value="{{ $message->sender_id }}">
+                
                 <div class="mb-4">
-                    <textarea name="body" rows="4" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Mesajınızı yazın..."></textarea>
+                    <label for="subject" class="block text-sm font-medium text-gray-700 mb-2">Konu</label>
+                    <input type="text" 
+                           id="subject" 
+                           name="subject" 
+                           value="Re: {{ $message->subject }}"
+                           class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                           required>
                 </div>
+                
+                <div class="mb-4">
+                    <label for="content" class="block text-sm font-medium text-gray-700 mb-2">Mesaj</label>
+                    <textarea name="content" 
+                              id="content"
+                              rows="4" 
+                              class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500" 
+                              placeholder="Mesajınızı yazın..."
+                              required></textarea>
+                </div>
+                
                 <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Gönder</button>
             </form>
         </div>

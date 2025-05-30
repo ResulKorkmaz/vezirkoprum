@@ -23,7 +23,23 @@ class MessageSendRequest extends FormRequest
     {
         return [
             'receiver_id' => ['required', 'exists:users,id'],
-            'body' => ['required', 'string', 'max:1000'],
+            'subject' => ['required', 'string', 'max:255'],
+            'content' => ['required', 'string', 'max:2000'],
+        ];
+    }
+
+    /**
+     * Get custom messages for validator errors.
+     */
+    public function messages(): array
+    {
+        return [
+            'receiver_id.required' => 'Alıcı seçilmelidir.',
+            'receiver_id.exists' => 'Geçersiz alıcı.',
+            'subject.required' => 'Konu alanı zorunludur.',
+            'subject.max' => 'Konu en fazla 255 karakter olabilir.',
+            'content.required' => 'Mesaj içeriği zorunludur.',
+            'content.max' => 'Mesaj en fazla 2000 karakter olabilir.',
         ];
     }
 }

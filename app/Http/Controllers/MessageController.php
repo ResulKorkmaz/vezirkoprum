@@ -7,6 +7,7 @@ use App\Models\Message;
 use App\Models\User;
 use App\Http\Requests\MessageSendRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 class MessageController extends Controller
 {
@@ -49,7 +50,12 @@ class MessageController extends Controller
     public function show($id)
     {
         $message = Message::findOrFail($id);
-        $this->authorize('view', $message);
+        
+        // Manuel authorization kontrolü
+        if (Auth::id() !== $message->sender_id && Auth::id() !== $message->receiver_id) {
+            abort(403, 'Bu mesajı görüntüleme yetkiniz yok.');
+        }
+        
         if (!$message->is_read && $message->receiver_id === Auth::id()) {
             $message->update(['is_read' => true, 'read_at' => now()]);
         }
@@ -77,7 +83,11 @@ class MessageController extends Controller
      */
     public function destroy(Message $message)
     {
-        $this->authorize('delete', $message);
+        // Manuel authorization kontrolü
+        if (Auth::id() !== $message->sender_id && Auth::id() !== $message->receiver_id) {
+            abort(403, 'Bu mesajı silme yetkiniz yok.');
+        }
+        
         $message->delete();
         return redirect()->route('messages.index')->with('success', 'Mesaj silindi.');
     }

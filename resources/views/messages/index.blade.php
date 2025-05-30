@@ -1,50 +1,70 @@
-@extends('layouts.app')
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            Mesajlarım
+        </h2>
+    </x-slot>
 
-@section('content')
-<div class="bg-white shadow rounded-lg p-6">
-    <h1 class="text-2xl font-bold mb-4">Mesajlarım</h1>
+    <div class="py-12">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900">
+                    <div class="space-y-4">
+                        @forelse($messages as $message)
+                            <div class="border border-gray-200 rounded-lg p-6 {{ !$message->is_read && $message->receiver_id === auth()->id() ? 'bg-rose-50 border-rose-200' : '' }}">
+                                <div class="flex justify-between items-start">
+                                    <div class="flex-1">
+                                        <p class="font-semibold mb-1 text-gray-700">
+                                            @if($message->sender_id === auth()->id())
+                                                Gönderilen: {{ $message->receiver->name }}
+                                            @else
+                                                Gelen: {{ $message->sender->name }}
+                                            @endif
+                                        </p>
+                                        <p class="text-lg font-medium text-gray-800 mb-2">{{ $message->subject }}</p>
+                                        <p class="text-gray-600">{{ Str::limit($message->content, 100) }}</p>
+                                    </div>
+                                    <div class="text-sm text-gray-500 text-right">
+                                        {{ $message->created_at->format('d.m.Y H:i') }}
+                                        @if(!$message->is_read && $message->receiver_id === auth()->id())
+                                            <span class="ml-2 bg-rose-500 text-white px-2 py-1 rounded-full text-xs">Yeni</span>
+                                        @endif
+                                    </div>
+                                </div>
+                                <div class="mt-3">
+                                    <a href="{{ route('messages.show', $message->id) }}" class="text-rose-600 hover:text-rose-700 text-sm font-medium inline-flex items-center">
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                        </svg>
+                                        Mesajı Görüntüle
+                                    </a>
+                                </div>
+                            </div>
+                        @empty
+                            <div class="text-center py-12">
+                                <svg class="w-20 h-20 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                </svg>
+                                <p class="text-gray-500 text-xl mb-2">Henüz mesajınız bulunmuyor.</p>
+                                <p class="text-gray-400 text-sm mb-6">Hemşehrilerinizle iletişime geçmek için ana sayfadan mesaj gönderebilirsiniz.</p>
+                                <a href="{{ route('home') }}" class="inline-flex items-center px-6 py-3 bg-rose-600 hover:bg-rose-700 text-white font-semibold rounded-lg transition-colors">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                    </svg>
+                                    Hemşehri Bul
+                                </a>
+                            </div>
+                        @endforelse
+                    </div>
 
-    <div class="space-y-4">
-        @forelse($messages as $message)
-            <div class="border rounded p-4 {{ !$message->is_read && $message->receiver_id === auth()->id() ? 'bg-blue-50' : '' }}">
-                <div class="flex justify-between items-start">
-                    <div class="flex-1">
-                        <p class="font-semibold mb-1">
-                            @if($message->sender_id === auth()->id())
-                                Gönderilen: {{ $message->receiver->name }}
-                            @else
-                                Gelen: {{ $message->sender->name }}
-                            @endif
-                        </p>
-                        <p class="text-lg font-medium text-gray-800 mb-2">{{ $message->subject }}</p>
-                        <p class="text-gray-600">{{ Str::limit($message->content, 100) }}</p>
-                    </div>
-                    <div class="text-sm text-gray-500 text-right">
-                        {{ $message->created_at->format('d.m.Y H:i') }}
-                        @if(!$message->is_read && $message->receiver_id === auth()->id())
-                            <span class="ml-2 bg-blue-500 text-white px-2 py-1 rounded-full text-xs">Yeni</span>
-                        @endif
-                    </div>
-                </div>
-                <div class="mt-3">
-                    <a href="{{ route('messages.show', $message->id) }}" class="text-blue-500 hover:text-blue-700 text-sm font-medium">Mesajı Görüntüle</a>
+                    @if($messages->hasPages())
+                        <div class="mt-6">
+                            {{ $messages->links() }}
+                        </div>
+                    @endif
                 </div>
             </div>
-        @empty
-            <div class="text-center py-8">
-                <svg class="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                </svg>
-                <p class="text-gray-500 text-lg">Henüz mesajınız bulunmuyor.</p>
-                <p class="text-gray-400 text-sm mt-2">Hemşehrilerinizle iletişime geçmek için ana sayfadan mesaj gönderebilirsiniz.</p>
-            </div>
-        @endforelse
-    </div>
-
-    @if($messages->hasPages())
-        <div class="mt-6">
-            {{ $messages->links() }}
         </div>
-    @endif
-</div>
-@endsection 
+    </div>
+</x-app-layout> 

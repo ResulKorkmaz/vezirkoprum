@@ -9,12 +9,20 @@ use Illuminate\Support\Facades\Route;
 // Ana sayfa - herkese açık
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
-// Authentication routes - Breeze kurulduktan sonra eklenecek
-// require __DIR__.'/auth.php';
+// KVKK sayfası - herkese açık
+Route::get('/kvkk', function () {
+    return view('kvkk');
+})->name('kvkk');
 
-// Giriş yapmış kullanıcılar için
+// Profil görüntüleme - herkese açık
+Route::get('/profile/{user}', [ProfileController::class, 'show'])->name('profile.show');
+
+// Dashboard'ı ana sayfaya yönlendir
+Route::get('/dashboard', function () {
+    return redirect()->route('home');
+})->middleware(['auth', 'verified'])->name('dashboard');
+
 Route::middleware('auth')->group(function () {
-    // Profil yönetimi
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
@@ -36,3 +44,5 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::resource('whatsapp', WhatsappController::class)->except(['index']);
 });
+
+require __DIR__.'/auth.php';

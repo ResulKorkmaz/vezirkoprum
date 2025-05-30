@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Message;
+use App\Models\User;
 use App\Http\Requests\MessageSendRequest;
 use Illuminate\Support\Facades\Auth;
 
@@ -17,16 +18,18 @@ class MessageController extends Controller
         $user = Auth::user();
         $messages = Message::where('sender_id', $user->id)
             ->orWhere('receiver_id', $user->id)
-            ->latest()->get();
+            ->with(['sender', 'receiver'])
+            ->latest()
+            ->paginate(10);
         return view('messages.index', compact('messages'));
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(User $user)
     {
-        //
+        return view('messages.create', compact('user'));
     }
 
     /**
@@ -48,7 +51,7 @@ class MessageController extends Controller
         $message = Message::findOrFail($id);
         $this->authorize('view', $message);
         if (!$message->is_read && $message->receiver_id === Auth::id()) {
-            $message->update(['is_read' => true]);
+            $message->update(['is_read' => true, 'read_at' => now()]);
         }
         return view('messages.show', compact('message'));
     }
@@ -72,8 +75,10 @@ class MessageController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Message $message)
     {
-        //
+        $this->authorize('delete', $message);
+        $message->delete();
+        return redirect()->route('messages.index')->with('success', 'Mesaj silindi.');
     }
 }

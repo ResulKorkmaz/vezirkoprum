@@ -13,6 +13,7 @@ class WhatsappGroup extends Model
         'description',
         'invite_link',
         'is_active',
+        'created_by',
     ];
 
     protected function casts(): array
@@ -20,5 +21,13 @@ class WhatsappGroup extends Model
         return [
             'is_active' => 'boolean',
         ];
+    }
+
+    /**
+     * Grubu oluşturan kullanıcı
+     */
+    public function creator()
+    {
+        return $this->belongsTo(\App\Models\User::class, 'created_by');
     }
 }

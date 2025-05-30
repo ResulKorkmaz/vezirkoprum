@@ -159,40 +159,55 @@
                             <svg class="w-6 h-6 text-rose-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
                             </svg>
-                            Hemşehrilerimiz 
-                            <span class="ml-2 px-3 py-1 bg-rose-100 text-rose-700 text-sm font-bold rounded-full">{{ $users->total() }} kişi</span>
+                            @if(!$hasFilters)
+                                Yeni Hemşehrilerimiz
+                            @else
+                                Hemşehrilerimiz 
+                                <span class="ml-2 px-3 py-1 bg-rose-100 text-rose-700 text-sm font-bold rounded-full">{{ $users->total() }} kişi</span>
+                            @endif
                         </h3>
+                        @if(!$hasFilters)
+                            <a href="{{ route('home') }}?show_all=1" class="text-rose-600 hover:text-rose-700 font-semibold text-sm">
+                                Tümünü Gör →
+                            </a>
+                        @endif
                     </div>
                     
                     @if($users->count() > 0)
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            @foreach($users as $user)
-                                <div class="border border-rose-100 rounded-xl p-6 hover:shadow-xl hover:border-rose-200 transition-all duration-300 bg-gradient-to-br from-white to-rose-50/30">
-                                    <div class="flex items-start space-x-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            @foreach($users as $index => $user)
+                                <div class="border border-rose-100 rounded-xl p-6 hover:shadow-xl hover:border-rose-200 transition-all duration-300 bg-gradient-to-br from-white to-rose-50/30 relative flex flex-col min-h-[400px]">
+                                    <!-- Yeni Üye Simgesi (sadece filtresiz ana sayfada ilk 8 üye için) -->
+                                    @if(!$hasFilters)
+                                        <div class="absolute -top-3 -right-3 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">
+                                            Yeni Üye
+                                        </div>
+                                    @endif
+                                    
+                                    <div class="flex flex-col items-center text-center flex-1">
                                         <!-- Profil Resmi -->
-                                        <div class="flex-shrink-0">
+                                        <div class="flex-shrink-0 mb-4">
                                             <a href="{{ route('profile.show', $user) }}">
-                                                <img class="h-14 w-14 rounded-xl object-cover border-2 border-rose-200 hover:border-rose-400 transition-colors shadow-md" 
+                                                <img class="h-16 w-16 rounded-full object-cover border-3 border-rose-200 hover:border-rose-400 transition-colors shadow-md" 
                                                      src="{{ $user->getVisibleProfilePhotoUrl(auth()->user()) }}" 
                                                      alt="{{ $user->name }}"
-                                                     onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRTVFN0VCIi8+CjxwYXRoIGQ9Ik01MCA0MEMzNy45NSA0MCAyOCAzNS4wNSAyOCAyOUM4IDIzIDEyLjk1IDE4IDI1IDE4SDE4QzMwLjA1IDE4IDM1IDIzIDM1IDI5QzM1IDM1LjA1IDMwLjA1IDQwIDI1IDQwSDUwWk01MCA1MEMzNy45NSA1MCAyOCA1NS4wNSAyOCA2MUM4IDY3IDEyLjk1IDcyIDI1IDcySDE4QzMwLjA1IDcyIDM1IDY3IDM1IDYxQzM1IDU1LjA1IDMwLjA1IDUwIDI1IDUwSDUwWiIgZmlsbD0iIzlDQTNBRiIvPgo8L3N2Zz4K'">
+                                                     onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRTVFN0VCIi8+CjxjaXJjbGUgY3g9IjUwIiBjeT0iMzUiIHI9IjE1IiBmaWxsPSIjOUNBM0FGIi8+CjxwYXRoIGQ9Ik0yNSA4NUMyNSA3MCAzNSA2MCA1MCA2MEM2NSA2MCA3NSA3MCA3NSA4NSIgc3Ryb2tlPSIjOUNBM0FGIiBzdHJva2Utd2lkdGg9IjMiIGZpbGw9Im5vbmUiLz4KPC9zdmc+'">
                                             </a>
                                         </div>
                                         
-                                        <div class="flex-1 min-w-0">
-                                            <h4 class="font-bold text-lg text-gray-900">
+                                        <div class="flex-1 min-w-0 w-full">
+                                            <h4 class="font-bold text-lg text-gray-900 mb-2">
                                                 <a href="{{ route('profile.show', $user) }}" class="hover:text-rose-600 transition-colors">
-                                                    {{ $user->name }}
-                                                    <span class="text-sm font-normal text-gray-500">(#{{ $user->unique_user_id }})</span>
+                                                    {{ $user->getDisplayNameWithIdForUser(auth()->user()) }}
                                                 </a>
                                             </h4>
                                             
                                             @if($user->profession)
-                                                <p class="text-rose-600 font-semibold">{{ $user->profession->name }}</p>
+                                                <p class="text-rose-600 font-semibold mb-2">{{ $user->profession->name }}</p>
                                             @endif
                                             
                                             @if($user->current_city)
-                                                <p class="text-gray-600 flex items-center mt-1">
+                                                <p class="text-gray-600 flex items-center justify-center mb-2">
                                                     <svg class="w-4 h-4 mr-1 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
@@ -201,8 +216,14 @@
                                                 </p>
                                             @endif
                                             
+                                            @if(!$hasFilters)
+                                                <p class="text-gray-400 text-sm mb-2">
+                                                    {{ $user->created_at->diffForHumans() }} katıldı
+                                                </p>
+                                            @endif
+                                            
                                             @if($user->show_phone && $user->display_phone)
-                                                <p class="text-gray-600 flex items-center mt-1">
+                                                <p class="text-gray-600 flex items-center justify-center mb-2">
                                                     <svg class="w-4 h-4 mr-1 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
                                                     </svg>
@@ -210,24 +231,28 @@
                                                 </p>
                                             @endif
                                             
-                                            @if($user->bio)
-                                                <p class="text-gray-500 text-sm mt-2 line-clamp-2">{{ Str::limit($user->bio, 100) }}</p>
-                                            @endif
+                                            <!-- Bio - Sabit yükseklik -->
+                                            <div class="h-12 mb-3">
+                                                @if($user->bio)
+                                                    <p class="text-gray-500 text-sm line-clamp-2">{{ Str::limit($user->bio, 60) }}</p>
+                                                @endif
+                                            </div>
                                         </div>
                                     </div>
                                     
+                                    <!-- Butonlar - En altta sabit -->
                                     @auth
                                         @if(auth()->id() !== $user->id)
-                                            <div class="mt-4 pt-4 border-t border-rose-100 flex space-x-2">
+                                            <div class="mt-auto pt-4 border-t border-rose-100 flex space-x-2">
                                                 <a href="{{ route('profile.show', $user) }}" 
-                                                   class="inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">
+                                                   class="flex-1 inline-flex items-center justify-center px-3 py-2 text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">
                                                     <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                                                     </svg>
                                                     Profil
                                                 </a>
                                                 <a href="{{ route('messages.create', $user) }}" 
-                                                   class="inline-flex items-center px-4 py-2 text-sm font-semibold text-white bg-rose-600 hover:bg-rose-700 rounded-lg transition-colors">
+                                                   class="flex-1 inline-flex items-center justify-center px-3 py-2 text-sm font-semibold text-white bg-rose-600 hover:bg-rose-700 rounded-lg transition-colors">
                                                     <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
                                                     </svg>
@@ -235,36 +260,38 @@
                                                 </a>
                                             </div>
                                         @else
-                                            <div class="mt-4 pt-4 border-t border-rose-100">
+                                            <div class="mt-auto pt-4 border-t border-rose-100">
                                                 <a href="{{ route('profile.edit') }}" 
-                                                   class="inline-flex items-center px-4 py-2 text-sm font-semibold text-white bg-rose-600 hover:bg-rose-700 rounded-lg transition-colors">
+                                                   class="inline-flex items-center justify-center w-full px-4 py-2 text-sm font-semibold text-white bg-rose-600 hover:bg-rose-700 rounded-lg transition-colors">
                                                     <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                                                     </svg>
                                                     Profili Düzenle
                                                 </a>
                                             </div>
                                         @endif
                                     @else
-                                        <div class="mt-4 pt-4 border-t border-rose-100">
+                                        <div class="mt-auto pt-4 border-t border-rose-100">
                                             <a href="{{ route('profile.show', $user) }}" 
-                                               class="inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors mr-2">
+                                               class="inline-flex items-center justify-center w-full px-4 py-2 text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors mb-2">
                                                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                                                 </svg>
                                                 Profil
                                             </a>
-                                            <span class="text-sm text-gray-500">Mesaj göndermek için <a href="{{ route('login') }}" class="text-rose-600 hover:underline font-semibold">giriş yapın</a></span>
+                                            <p class="text-xs text-gray-500 text-center">Mesaj için <a href="{{ route('login') }}" class="text-rose-600 hover:underline font-semibold">giriş yapın</a></p>
                                         </div>
                                     @endauth
                                 </div>
                             @endforeach
                         </div>
 
-                        <!-- Pagination -->
-                        <div class="mt-8">
-                            {{ $users->links() }}
-                        </div>
+                        <!-- Pagination (sadece filtreleme varsa) -->
+                        @if($hasFilters)
+                            <div class="mt-8">
+                                {{ $users->links() }}
+                            </div>
+                        @endif
                     @else
                         <div class="text-center py-16">
                             <div class="w-24 h-24 mx-auto mb-6 bg-rose-100 rounded-full flex items-center justify-center">
@@ -283,6 +310,112 @@
                         </div>
                     @endif
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hakkımızda Bölümü -->
+    <div class="py-16 bg-gradient-to-br from-gray-50 to-gray-100">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">
+                    <span class="bg-gradient-to-r from-rose-600 to-pink-600 bg-clip-text text-transparent">
+                        Hakkımızda
+                    </span>
+                </h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Vezirköprü'den olan hemşehrilerimizi bir araya getiren, güçlü bir topluluk oluşturmayı hedefliyoruz.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Misyonumuz -->
+                <div class="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow duration-300 border border-rose-100">
+                    <div class="w-16 h-16 bg-rose-100 rounded-full flex items-center justify-center mb-6 mx-auto">
+                        <svg class="w-8 h-8 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-4 text-center">Misyonumuz</h3>
+                    <p class="text-gray-600 text-center leading-relaxed">
+                        Vezirköprü'den olan hemşehrilerimizi dijital ortamda buluşturarak, güçlü bir topluluk ağı oluşturmak ve birbirimize destek olmayı sağlamak.
+                    </p>
+                </div>
+
+                <!-- Vizyonumuz -->
+                <div class="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow duration-300 border border-rose-100">
+                    <div class="w-16 h-16 bg-rose-100 rounded-full flex items-center justify-center mb-6 mx-auto">
+                        <svg class="w-8 h-8 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-4 text-center">Vizyonumuz</h3>
+                    <p class="text-gray-600 text-center leading-relaxed">
+                        Türkiye'nin dört bir yanına dağılmış Vezirköprülülerin en büyük dijital buluşma noktası olmak ve hemşehrilik bağlarını güçlendirmek.
+                    </p>
+                </div>
+
+                <!-- Değerlerimiz -->
+                <div class="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow duration-300 border border-rose-100 md:col-span-2 lg:col-span-1">
+                    <div class="w-16 h-16 bg-rose-100 rounded-full flex items-center justify-center mb-6 mx-auto">
+                        <svg class="w-8 h-8 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-4 text-center">Değerlerimiz</h3>
+                    <p class="text-gray-600 text-center leading-relaxed">
+                        Samimiyet, dayanışma, güven ve hemşehrilik sevgisi. Birbirimize saygı göstererek, yardımlaşma ruhuyla hareket ediyoruz.
+                    </p>
+                </div>
+            </div>
+
+            <!-- İstatistikler -->
+            <div class="mt-16 bg-white rounded-2xl p-8 shadow-lg border border-rose-100">
+                <h3 class="text-2xl font-bold text-gray-900 mb-8 text-center">Topluluğumuz Rakamlarla</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+                    <div class="text-center">
+                        <div class="text-3xl font-black text-rose-600 mb-2">{{ $users->total() }}</div>
+                        <div class="text-gray-600 font-medium">Kayıtlı Hemşehri</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl font-black text-rose-600 mb-2">{{ count($cities) }}</div>
+                        <div class="text-gray-600 font-medium">Farklı Şehir</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl font-black text-rose-600 mb-2">{{ count($professions) }}</div>
+                        <div class="text-gray-600 font-medium">Farklı Meslek</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl font-black text-rose-600 mb-2">1</div>
+                        <div class="text-gray-600 font-medium">Güçlü Topluluk</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CTA Bölümü -->
+            <div class="mt-12 text-center">
+                <h3 class="text-2xl font-bold text-gray-900 mb-4">Sen de Aramıza Katıl!</h3>
+                <p class="text-gray-600 mb-8 max-w-2xl mx-auto">
+                    Vezirköprü'den misin? O zaman doğru yerdesin! Hemen kaydol ve hemşehrilerinle tanış.
+                </p>
+                @guest
+                    <a href="{{ route('register') }}" 
+                       class="inline-flex items-center px-8 py-4 bg-rose-600 hover:bg-rose-700 text-white text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
+                        </svg>
+                        Hemen Kaydol
+                    </a>
+                @else
+                    <a href="#hemşehriler" 
+                       class="inline-flex items-center px-8 py-4 bg-rose-600 hover:bg-rose-700 text-white text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                        Hemşehri Bul
+                    </a>
+                @endguest
             </div>
         </div>
     </div>

@@ -42,11 +42,21 @@
                                 <h2 class="text-xl font-semibold mb-2 text-gray-800">{{ $message->subject }}</h2>
                                 <p class="font-semibold text-gray-700">
                                     @if($message->sender_id === auth()->id())
-                                        Gönderilen: {{ $message->receiver->name }} 
-                                        <span class="text-sm text-gray-500">(#{{ $message->receiver->unique_user_id }})</span>
+                                        Gönderilen: 
+                                        <a href="{{ route('profile.show', $message->receiver) }}" class="text-rose-600 hover:text-rose-700 hover:underline transition-colors">
+                                            {{ $message->receiver->name }}
+                                        </a>
+                                        @if(auth()->user()->is_admin)
+                                            <span class="text-sm text-gray-500">(#{{ $message->receiver->unique_user_id }})</span>
+                                        @endif
                                     @else
-                                        Gelen: {{ $message->sender->name }} 
-                                        <span class="text-sm text-gray-500">(#{{ $message->sender->unique_user_id }})</span>
+                                        Gelen: 
+                                        <a href="{{ route('profile.show', $message->sender) }}" class="text-rose-600 hover:text-rose-700 hover:underline transition-colors">
+                                            {{ $message->sender->name }}
+                                        </a>
+                                        @if(auth()->user()->is_admin)
+                                            <span class="text-sm text-gray-500">(#{{ $message->sender->unique_user_id }})</span>
+                                        @endif
                                     @endif
                                 </p>
                                 <p class="text-sm text-gray-500">{{ $message->created_at->format('d.m.Y H:i') }}</p>

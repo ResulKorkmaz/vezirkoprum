@@ -1,7 +1,10 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            Mesaj Gönder - {{ $user->name }}
+            Mesaj Gönder - 
+            <a href="{{ route('profile.show', $user) }}" class="text-rose-600 hover:text-rose-700 hover:underline transition-colors">
+                {{ $user->name }}
+            </a>
         </h2>
     </x-slot>
 
@@ -14,7 +17,11 @@
                         <h3 class="text-lg font-medium text-gray-900 mb-2">Alıcı</h3>
                         <div class="flex items-center space-x-4">
                             <div>
-                                <p class="font-semibold">{{ $user->name }}</p>
+                                <p class="font-semibold">
+                                    <a href="{{ route('profile.show', $user) }}" class="text-rose-600 hover:text-rose-700 hover:underline transition-colors">
+                                        {{ $user->name }}
+                                    </a>
+                                </p>
                                 @if($user->profession)
                                     <p class="text-blue-600">{{ $user->profession->name }}</p>
                                 @endif

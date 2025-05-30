@@ -34,6 +34,15 @@ class User extends Authenticatable
         'profile_photo_visibility',
         'kvkk_consent',
         'kvkk_consent_date',
+        'is_admin',
+        'is_suspended',
+        'suspended_until',
+        'suspension_reason',
+        'suspended_by',
+        'suspended_at',
+        'admin_notes',
+        'last_login_at',
+        'last_login_ip',
     ];
 
     /**
@@ -59,6 +68,10 @@ class User extends Authenticatable
             'password' => 'hashed',
             'show_phone' => 'boolean',
             'is_admin' => 'boolean',
+            'is_suspended' => 'boolean',
+            'suspended_until' => 'datetime',
+            'suspended_at' => 'datetime',
+            'last_login_at' => 'datetime',
             'birth_year' => 'integer',
         ];
     }
@@ -268,35 +281,13 @@ class User extends Authenticatable
     /**
      * Kullanıcı verilerini arşivle
      */
-    public function archiveUserData($reason = null)
+    public function archiveUserData($reason = 'Kullanıcı silindi')
     {
-        $compressedData = gzcompress(json_encode([
-            'original_data' => $this->toArray(),
-            'messages_sent' => $this->sentMessages()->count(),
-            'messages_received' => $this->receivedMessages()->count(),
-            'last_login' => $this->updated_at,
-            'registration_ip' => request()->ip(),
-            'user_agent' => request()->userAgent(),
-            'archived_at' => now(),
-        ]));
-
-        \App\Models\DeletedUserArchive::create([
-            'unique_user_id' => $this->unique_user_id,
-            'name' => $this->name,
-            'email' => $this->email,
-            'phone' => $this->getRawPhoneAttribute(), // Şifreli telefon
-            'current_city' => $this->current_city,
-            'current_district' => $this->current_district,
-            'profession_id' => $this->profession_id,
-            'bio' => $this->bio,
-            'profile_photo' => $this->profile_photo,
-            'show_phone' => $this->show_phone,
-            'email_verified_at' => $this->email_verified_at,
-            'original_created_at' => $this->created_at,
-            'deleted_at' => now(),
-            'deletion_reason' => $reason,
-            'deleted_by_ip' => request()->ip(),
-            'compressed_data' => base64_encode($compressedData),
+        // Bu metod gelecekte kullanıcı verilerini arşivlemek için kullanılabilir
+        // Şimdilik sadece admin notlarına ekliyoruz
+        $this->update([
+            'admin_notes' => ($this->admin_notes ? $this->admin_notes . "\n\n" : '') . 
+                           '[' . now()->format('d.m.Y H:i') . '] Arşivlendi: ' . $reason
         ]);
     }
 
@@ -314,5 +305,160 @@ class User extends Authenticatable
     public function getShortDisplayNameAttribute()
     {
         return '#' . $this->unique_user_id;
+    }
+
+    /**
+     * Admin kullanıcı mı kontrol et
+     */
+    public function isAdmin()
+    {
+        return $this->is_admin ?? false;
+    }
+
+    /**
+     * Kullanıcı ID'sini admin kontrolü ile göster
+     */
+    public function getDisplayNameWithIdForUser($viewer = null)
+    {
+        $name = $this->name;
+        
+        if ($viewer && $viewer->isAdmin()) {
+            $name .= ' (#' . $this->unique_user_id . ')';
+        }
+        
+        return $name;
+    }
+
+    /**
+     * Askıya alan admin ile ilişki
+     */
+    public function suspendedBy()
+    {
+        return $this->belongsTo(User::class, 'suspended_by');
+    }
+
+    /**
+     * Bu admin tarafından askıya alınan kullanıcılar
+     */
+    public function suspendedUsers()
+    {
+        return $this->hasMany(User::class, 'suspended_by');
+    }
+
+    /**
+     * Kullanıcı askıda mı kontrol et
+     */
+    public function isSuspended()
+    {
+        if (!$this->is_suspended) {
+            return false;
+        }
+
+        // Süresiz askı
+        if (!$this->suspended_until) {
+            return true;
+        }
+
+        // Süreli askı - süre dolmuş mu kontrol et
+        if ($this->suspended_until->isPast()) {
+            // Askıyı otomatik kaldır
+            $this->update([
+                'is_suspended' => false,
+                'suspended_until' => null,
+                'suspension_reason' => null,
+                'suspended_by' => null,
+                'suspended_at' => null,
+            ]);
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Kullanıcıyı askıya al
+     */
+    public function suspend($reason, $adminId, $until = null)
+    {
+        $this->update([
+            'is_suspended' => true,
+            'suspended_until' => $until,
+            'suspension_reason' => $reason,
+            'suspended_by' => $adminId,
+            'suspended_at' => now(),
+        ]);
+    }
+
+    /**
+     * Kullanıcının askısını kaldır
+     */
+    public function unsuspend()
+    {
+        $this->update([
+            'is_suspended' => false,
+            'suspended_until' => null,
+            'suspension_reason' => null,
+            'suspended_by' => null,
+            'suspended_at' => null,
+        ]);
+    }
+
+    /**
+     * Askı durumu bilgisi
+     */
+    public function getSuspensionStatusAttribute()
+    {
+        if (!$this->is_suspended) {
+            return 'Aktif';
+        }
+
+        if (!$this->suspended_until) {
+            return 'Süresiz Askıda';
+        }
+
+        if ($this->suspended_until->isFuture()) {
+            return 'Askıda (' . $this->suspended_until->diffForHumans() . ' kadar)';
+        }
+
+        return 'Askı Süresi Dolmuş';
+    }
+
+    /**
+     * Son giriş bilgisini güncelle
+     */
+    public function updateLastLogin($ip = null)
+    {
+        $this->update([
+            'last_login_at' => now(),
+            'last_login_ip' => $ip ?: request()->ip(),
+        ]);
+    }
+
+    /**
+     * Kullanıcı yasaklı mı kontrol et (kayıt sırasında)
+     */
+    public static function isUserBanned($email, $phone = null)
+    {
+        // E-posta kontrolü
+        if (\App\Models\BannedUser::isEmailBanned($email)) {
+            return true;
+        }
+
+        // Telefon kontrolü
+        if ($phone && \App\Models\BannedUser::isPhoneBanned($phone)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Şifre sıfırlama
+     */
+    public function resetPassword($newPassword)
+    {
+        $this->update([
+            'password' => bcrypt($newPassword),
+        ]);
     }
 }

@@ -12,6 +12,9 @@ class HomeController extends Controller
     {
         $query = User::with('profession');
         
+        // Filtre var mı kontrol et
+        $hasFilters = $request->hasAny(['city', 'district', 'profession_id', 'show_all']);
+        
         // Şehir filtresi
         if ($request->filled('city')) {
             $query->where('current_city', $request->city);
@@ -27,10 +30,24 @@ class HomeController extends Controller
             $query->where('profession_id', $request->profession_id);
         }
         
-        $users = $query->paginate(12);
+        // Filtre yoksa sadece ilk 8 üyeyi göster, varsa pagination kullan
+        if (!$hasFilters) {
+            $users = $query->orderBy('created_at', 'desc')->limit(8)->get();
+            // Collection'ı paginator gibi göstermek için
+            $users = new \Illuminate\Pagination\LengthAwarePaginator(
+                $users,
+                User::count(),
+                8,
+                1,
+                ['path' => request()->url()]
+            );
+        } else {
+            $users = $query->paginate(12);
+        }
+        
         $professions = Profession::where('is_active', true)->orderBy('name')->get();
         $cities = config('turkiye.cities');
         
-        return view('home', compact('users', 'professions', 'cities'));
+        return view('home', compact('users', 'professions', 'cities', 'hasFilters'));
     }
 }

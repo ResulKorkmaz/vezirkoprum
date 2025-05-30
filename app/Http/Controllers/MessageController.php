@@ -81,8 +81,10 @@ class MessageController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Message $message)
+    public function destroy($id)
     {
+        $message = Message::findOrFail($id);
+        
         // Manuel authorization kontrolü
         if (Auth::id() !== $message->sender_id && Auth::id() !== $message->receiver_id) {
             abort(403, 'Bu mesajı silme yetkiniz yok.');
@@ -90,5 +92,38 @@ class MessageController extends Controller
         
         $message->delete();
         return redirect()->route('messages.index')->with('success', 'Mesaj silindi.');
+    }
+
+    /**
+     * Bulk delete messages
+     */
+    public function bulkDelete(Request $request)
+    {
+        $request->validate([
+            'message_ids' => 'required|array',
+            'message_ids.*' => 'exists:messages,id'
+        ]);
+
+        $messageIds = $request->message_ids;
+        $userId = Auth::id();
+        
+        // Sadece kullanıcının kendi mesajlarını silebilir
+        $messages = Message::whereIn('id', $messageIds)
+            ->where(function($query) use ($userId) {
+                $query->where('sender_id', $userId)
+                      ->orWhere('receiver_id', $userId);
+            })
+            ->get();
+
+        $deletedCount = $messages->count();
+        
+        if ($deletedCount === 0) {
+            return redirect()->route('messages.index')->with('error', 'Silme yetkiniz olmayan mesajlar seçildi.');
+        }
+
+        // Mesajları sil
+        Message::whereIn('id', $messages->pluck('id'))->delete();
+
+        return redirect()->route('messages.index')->with('success', "{$deletedCount} mesaj silindi.");
     }
 }

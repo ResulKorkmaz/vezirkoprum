@@ -34,6 +34,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/', [MessageController::class, 'store'])->name('store');
         Route::get('/{message}', [MessageController::class, 'show'])->name('show');
         Route::delete('/{message}', [MessageController::class, 'destroy'])->name('destroy');
+        Route::delete('/', [MessageController::class, 'bulkDelete'])->name('bulk-delete');
     });
     
     // WhatsApp grupları - sadece görüntüleme

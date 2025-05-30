@@ -94,9 +94,9 @@
             <x-input-error :messages="$errors->get('kvkk_consent')" class="mt-2" />
         </div>
 
-        <div class="flex items-center justify-end mt-6">
-            <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('login') }}">
-                Zaten hesabınız var mı?
+        <div class="flex items-center justify-between mt-6">
+            <a class="underline text-sm text-rose-600 hover:text-rose-700 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-rose-500 font-medium" href="{{ route('login') }}">
+                Zaten hesabınız var mı? Giriş Yapın
             </a>
 
             <x-primary-button class="ms-4">
@@ -104,6 +104,27 @@
             </x-primary-button>
         </div>
     </form>
+
+    <!-- Login Call to Action -->
+    <div class="mt-6 text-center">
+        <div class="relative">
+            <div class="absolute inset-0 flex items-center">
+                <div class="w-full border-t border-gray-300"></div>
+            </div>
+            <div class="relative flex justify-center text-sm">
+                <span class="px-2 bg-white text-gray-500">Zaten hesabınız var mı?</span>
+            </div>
+        </div>
+        
+        <div class="mt-4">
+            <a href="{{ route('login') }}" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:from-emerald-600 hover:to-teal-600 focus:from-emerald-600 focus:to-teal-600 active:from-emerald-700 active:to-teal-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition ease-in-out duration-150 shadow-lg">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
+                </svg>
+                Giriş Yap
+            </a>
+        </div>
+    </div>
 
     <script>
         const citiesRegister = @json(config('turkiye.cities'));

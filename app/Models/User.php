@@ -22,6 +22,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'unique_user_id',
         'profession_id',
         'current_city',
         'current_district',
@@ -218,5 +219,100 @@ class User extends Authenticatable
         
         // Telefon numarası olarak ara
         return self::findByPhone($identifier);
+    }
+
+    /**
+     * Model events
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        // Yeni kullanıcı oluşturulduğunda benzersiz ID ata
+        static::creating(function ($user) {
+            if (!$user->unique_user_id) {
+                $user->unique_user_id = self::generateUniqueUserId();
+            }
+        });
+
+        // Kullanıcı silinmeden önce arşivle
+        static::deleting(function ($user) {
+            $user->archiveUserData();
+        });
+    }
+
+    /**
+     * Benzersiz kullanıcı ID oluştur
+     */
+    public static function generateUniqueUserId()
+    {
+        $startId = 55900;
+        
+        // Son kullanılan ID'yi bul
+        $lastUser = self::orderBy('unique_user_id', 'desc')->first();
+        if ($lastUser && $lastUser->unique_user_id) {
+            $startId = max($startId, (int)$lastUser->unique_user_id + 1);
+        }
+        
+        // Benzersiz ID bul
+        do {
+            $uniqueId = (string) $startId;
+            $exists = self::where('unique_user_id', $uniqueId)->exists() || 
+                     \App\Models\DeletedUserArchive::where('unique_user_id', $uniqueId)->exists();
+            $startId++;
+        } while ($exists);
+        
+        return $uniqueId;
+    }
+
+    /**
+     * Kullanıcı verilerini arşivle
+     */
+    public function archiveUserData($reason = null)
+    {
+        $compressedData = gzcompress(json_encode([
+            'original_data' => $this->toArray(),
+            'messages_sent' => $this->sentMessages()->count(),
+            'messages_received' => $this->receivedMessages()->count(),
+            'last_login' => $this->updated_at,
+            'registration_ip' => request()->ip(),
+            'user_agent' => request()->userAgent(),
+            'archived_at' => now(),
+        ]));
+
+        \App\Models\DeletedUserArchive::create([
+            'unique_user_id' => $this->unique_user_id,
+            'name' => $this->name,
+            'email' => $this->email,
+            'phone' => $this->getRawPhoneAttribute(), // Şifreli telefon
+            'current_city' => $this->current_city,
+            'current_district' => $this->current_district,
+            'profession_id' => $this->profession_id,
+            'bio' => $this->bio,
+            'profile_photo' => $this->profile_photo,
+            'show_phone' => $this->show_phone,
+            'email_verified_at' => $this->email_verified_at,
+            'original_created_at' => $this->created_at,
+            'deleted_at' => now(),
+            'deletion_reason' => $reason,
+            'deleted_by_ip' => request()->ip(),
+            'compressed_data' => base64_encode($compressedData),
+        ]);
+    }
+
+    /**
+     * Kullanıcı ID ile görüntüleme adı
+     */
+    public function getDisplayNameWithIdAttribute()
+    {
+        return $this->name . ' (#' . $this->unique_user_id . ')';
+    }
+
+    /**
+     * Kısa görüntüleme adı (sadece ID)
+     */
+    public function getShortDisplayNameAttribute()
+    {
+        return '#' . $this->unique_user_id;
     }
 }

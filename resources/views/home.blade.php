@@ -183,6 +183,7 @@
                                             <h4 class="font-bold text-lg text-gray-900">
                                                 <a href="{{ route('profile.show', $user) }}" class="hover:text-rose-600 transition-colors">
                                                     {{ $user->name }}
+                                                    <span class="text-sm font-normal text-gray-500">(#{{ $user->unique_user_id }})</span>
                                                 </a>
                                             </h4>
                                             

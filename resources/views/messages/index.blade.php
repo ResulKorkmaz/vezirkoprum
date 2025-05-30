@@ -45,9 +45,11 @@
                                                 <div class="flex-1">
                                                     <p class="font-semibold mb-1 text-gray-700">
                                                         @if($message->sender_id === auth()->id())
-                                                            Gönderilen: {{ $message->receiver->name }}
+                                                            Gönderilen: {{ $message->receiver->name }} 
+                                                            <span class="text-sm text-gray-500">(#{{ $message->receiver->unique_user_id }})</span>
                                                         @else
-                                                            Gelen: {{ $message->sender->name }}
+                                                            Gelen: {{ $message->sender->name }} 
+                                                            <span class="text-sm text-gray-500">(#{{ $message->sender->unique_user_id }})</span>
                                                         @endif
                                                     </p>
                                                     <p class="text-lg font-medium text-gray-800 mb-2">{{ $message->subject }}</p>

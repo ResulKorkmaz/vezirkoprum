@@ -42,9 +42,11 @@
                                 <h2 class="text-xl font-semibold mb-2 text-gray-800">{{ $message->subject }}</h2>
                                 <p class="font-semibold text-gray-700">
                                     @if($message->sender_id === auth()->id())
-                                        Gönderilen: {{ $message->receiver->name }}
+                                        Gönderilen: {{ $message->receiver->name }} 
+                                        <span class="text-sm text-gray-500">(#{{ $message->receiver->unique_user_id }})</span>
                                     @else
-                                        Gelen: {{ $message->sender->name }}
+                                        Gelen: {{ $message->sender->name }} 
+                                        <span class="text-sm text-gray-500">(#{{ $message->sender->unique_user_id }})</span>
                                     @endif
                                 </p>
                                 <p class="text-sm text-gray-500">{{ $message->created_at->format('d.m.Y H:i') }}</p>

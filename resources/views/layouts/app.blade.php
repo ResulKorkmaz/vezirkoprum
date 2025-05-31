@@ -157,9 +157,17 @@
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
                     <div class="md:flex md:items-center md:justify-between">
                         <div class="flex justify-center md:order-2">
-                            <p class="text-gray-400 text-sm">
-                                © {{ date('Y') }} Vezirköprü Hemşehrileri. Tüm hakları saklıdır.
-                            </p>
+                            <div class="text-center">
+                                <p class="text-gray-400 text-sm">
+                                    © {{ date('Y') }} Vezirköprü Hemşehrileri. Tüm hakları saklıdır.
+                                </p>
+                                <p class="text-gray-500 text-xs mt-1">
+                                    <a href="https://www.resulkorkmaz.com" target="_blank" rel="noopener noreferrer" 
+                                       class="hover:text-rose-400 transition-colors duration-200">
+                                        RK Dijital Reklam Ajansı
+                                    </a>
+                                </p>
+                            </div>
                         </div>
                         <div class="mt-4 flex justify-center md:mt-0 md:order-1">
                             <div class="flex space-x-6">

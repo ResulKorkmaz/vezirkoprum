@@ -11,9 +11,17 @@ LOCAL_DIR="$(pwd)"
 
 echo "🚀 Hostinger'a deploy başlıyor..."
 
+# Local'de build yap
+echo "🔨 Local'de CSS/JS build ediliyor..."
+npm run build
+
 # Git pull ile son değişiklikleri çek
 echo "📥 GitHub'dan son değişiklikler çekiliyor..."
 ssh -i $SSH_KEY -p $SSH_PORT $USER@$HOST "cd $REMOTE_ROOT && git pull origin main"
+
+# Build dosyalarını upload et
+echo "📤 Build dosyaları upload ediliyor..."
+scp -i $SSH_KEY -P $SSH_PORT -r public/build/* $USER@$HOST:$REMOTE_ROOT/public/build/
 
 # Composer install (platform requirements ignore)
 echo "📦 Composer dependencies kuruluyor..."

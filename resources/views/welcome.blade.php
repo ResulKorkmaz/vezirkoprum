@@ -84,11 +84,11 @@
                 <h2 class="text-3xl font-bold text-gray-800 mb-8">Topluluk İstatistikleri</h2>
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
                     <div>
-                        <div class="text-3xl font-bold text-blue-600">{{ \App\Models\User::count() }}</div>
+                        <div class="text-3xl font-bold text-blue-600">{{ \App\Models\User::where('is_admin', false)->count() }}</div>
                         <div class="text-gray-600">Kayıtlı Üye</div>
                     </div>
                     <div>
-                        <div class="text-3xl font-bold text-green-600">{{ \App\Models\User::whereNotNull('current_city')->distinct('current_city')->count() }}</div>
+                        <div class="text-3xl font-bold text-green-600">{{ \App\Models\User::where('is_admin', false)->whereNotNull('current_city')->distinct('current_city')->count() }}</div>
                         <div class="text-gray-600">Şehir</div>
                     </div>
                     <div>

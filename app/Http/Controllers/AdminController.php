@@ -80,7 +80,7 @@ class AdminController extends Controller
             'verified_users' => User::whereNotNull('email_verified_at')->count(),
         ];
 
-        $recentUsers = User::latest()->limit(10)->get();
+        $recentUsers = User::where('is_admin', false)->latest()->limit(10)->get();
 
         return view('admin.dashboard', compact('stats', 'recentUsers'));
     }

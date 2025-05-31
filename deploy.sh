@@ -15,9 +15,9 @@ echo "🚀 Hostinger'a deploy başlıyor..."
 echo "📥 GitHub'dan son değişiklikler çekiliyor..."
 ssh -i $SSH_KEY -p $SSH_PORT $USER@$HOST "cd $REMOTE_ROOT && git pull origin main"
 
-# Composer install
+# Composer install (platform requirements ignore)
 echo "📦 Composer dependencies kuruluyor..."
-ssh -i $SSH_KEY -p $SSH_PORT $USER@$HOST "cd $REMOTE_ROOT && composer install --no-dev --optimize-autoloader"
+ssh -i $SSH_KEY -p $SSH_PORT $USER@$HOST "cd $REMOTE_ROOT && composer install --no-dev --optimize-autoloader --ignore-platform-reqs"
 
 # Migration'ları çalıştır
 echo "🗄️ Database migration'ları çalıştırılıyor..."
@@ -34,9 +34,9 @@ ssh -i $SSH_KEY -p $SSH_PORT $USER@$HOST "cd $REMOTE_ROOT && \
     php artisan route:cache && \
     php artisan view:cache"
 
-# Storage link oluştur
+# Storage link oluştur (manuel)
 echo "🔗 Storage link oluşturuluyor..."
-ssh -i $SSH_KEY -p $SSH_PORT $USER@$HOST "cd $REMOTE_ROOT && php artisan storage:link"
+ssh -i $SSH_KEY -p $SSH_PORT $USER@$HOST "cd $REMOTE_ROOT && ln -sf $REMOTE_ROOT/storage/app/public $REMOTE_ROOT/public_html/storage"
 
 # .env dosyasını güncelle
 echo "⚙️ Environment dosyası güncelleniyor..."
@@ -44,4 +44,6 @@ ssh -i $SSH_KEY -p $SSH_PORT $USER@$HOST "cd $REMOTE_ROOT && cp hostinger.env .e
 
 echo "✅ Deployment tamamlandı!"
 echo "🌐 Site: https://vezirkoprum.com.tr"
-echo "🔧 Admin: https://vezirkoprum.com.tr/admin/login" 
+echo "🔧 Admin: https://vezirkoprum.com.tr/admin/login"
+echo "👤 Admin Kullanıcı: rslkrkmz"
+echo "🔑 Admin Şifre: Rr123456" 

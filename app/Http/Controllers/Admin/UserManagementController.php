@@ -86,6 +86,7 @@ class UserManagementController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
             'profession_id' => 'nullable|exists:professions,id',
+            'retirement_detail' => 'nullable|string|max:255',
             'current_city' => 'nullable|string',
             'current_district' => 'nullable|string',
             'birth_year' => 'nullable|integer|min:1900|max:' . date('Y'),
@@ -96,7 +97,7 @@ class UserManagementController extends Controller
         ]);
 
         $user->update($request->only([
-            'name', 'email', 'profession_id', 'current_city', 'current_district',
+            'name', 'email', 'profession_id', 'retirement_detail', 'current_city', 'current_district',
             'birth_year', 'bio', 'show_phone', 'is_admin', 'admin_notes'
         ]));
 

@@ -24,6 +24,7 @@ class User extends Authenticatable
         'password',
         'unique_user_id',
         'profession_id',
+        'retirement_detail',
         'current_city',
         'current_district',
         'phone',
@@ -82,6 +83,25 @@ class User extends Authenticatable
     public function profession()
     {
         return $this->belongsTo(Profession::class);
+    }
+
+    /**
+     * Meslek gösterimi (emekli detayı ile birlikte)
+     */
+    public function getDisplayProfessionAttribute()
+    {
+        if (!$this->profession) {
+            return null;
+        }
+
+        $professionName = $this->profession->name;
+        
+        // Eğer meslek "Emekli" ise ve retirement_detail varsa
+        if ($professionName === 'Emekli' && $this->retirement_detail) {
+            return "Emekli ({$this->retirement_detail})";
+        }
+        
+        return $professionName;
     }
 
     public function sentMessages()

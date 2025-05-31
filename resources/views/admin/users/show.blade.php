@@ -11,6 +11,13 @@
                 <p><strong>Durum:</strong> {{ $user->suspension_status }}</p>
                 <p><strong>Kayıt Tarihi:</strong> {{ $user->created_at->format('d.m.Y H:i') }}</p>
                 
+                @if($user->profession)
+                    <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                        <dt class="text-sm font-medium text-gray-500">Meslek</dt>
+                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ $user->display_profession }}</dd>
+                    </div>
+                @endif
+                
                 <div class="mt-8 flex flex-wrap gap-3">
                     <a href="{{ route('admin.users.edit', $user) }}" 
                        class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">

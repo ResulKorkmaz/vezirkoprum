@@ -161,9 +161,9 @@
                                 <p class="text-gray-400 text-sm">
                                     © {{ date('Y') }} Vezirköprü Hemşehrileri. Tüm hakları saklıdır.
                                 </p>
-                                <p class="text-gray-500 text-xs mt-1">
+                                <p class="text-gray-400 text-sm mt-2">
                                     <a href="https://www.resulkorkmaz.com" target="_blank" rel="noopener noreferrer" 
-                                       class="hover:text-rose-400 transition-colors duration-200">
+                                       class="text-rose-400 hover:text-rose-300 transition-colors duration-200 font-medium">
                                         RK Dijital Reklam Ajansı
                                     </a>
                                 </p>

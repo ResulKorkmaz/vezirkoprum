@@ -20,7 +20,7 @@
             <!-- Profession -->
             <div>
                 <x-input-label for="profession_id" value="Meslek *" />
-                <select id="profession_id" name="profession_id" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
+                <select id="profession_id" name="profession_id" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required onchange="toggleRetirementDetail()">
                     <option value="">Meslek Seçin</option>
                     @foreach(\App\Models\Profession::where('is_active', true)->orderBy('name')->get() as $profession)
                         <option value="{{ $profession->id }}" {{ old('profession_id') == $profession->id ? 'selected' : '' }}>
@@ -29,6 +29,14 @@
                     @endforeach
                 </select>
                 <x-input-error :messages="$errors->get('profession_id')" class="mt-2" />
+            </div>
+
+            <!-- Retirement Detail (Hidden by default) -->
+            <div id="retirement_detail_div" style="display: none;">
+                <x-input-label for="retirement_detail" value="Ne Emeklisi? (Opsiyonel)" />
+                <x-text-input id="retirement_detail" name="retirement_detail" type="text" class="mt-1 block w-full" :value="old('retirement_detail')" placeholder="Örn: Doktor, Öğretmen, Polis..." />
+                <x-input-error :messages="$errors->get('retirement_detail')" class="mt-2" />
+                <p class="text-sm text-gray-600 mt-1">Emekli olmadan önceki mesleğinizi yazabilirsiniz.</p>
             </div>
 
             <!-- City -->
@@ -151,6 +159,20 @@
         }
         
         // Sayfa yüklendiğinde çalıştır
-        document.addEventListener('DOMContentLoaded', updateDistrictsRegister);
+        document.addEventListener('DOMContentLoaded', function() {
+            updateDistrictsRegister();
+            toggleRetirementDetail(); // Emekli alanını kontrol et
+        });
+
+        function toggleRetirementDetail() {
+            const professionSelect = document.getElementById('profession_id');
+            const retirementDetailDiv = document.getElementById('retirement_detail_div');
+            
+            if (professionSelect.value === '82') { // Emekli profession ID
+                retirementDetailDiv.style.display = 'block';
+            } else {
+                retirementDetailDiv.style.display = 'none';
+            }
+        }
     </script>
 </x-guest-layout>

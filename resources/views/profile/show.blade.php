@@ -24,7 +24,7 @@
                         
                         <!-- Meslek -->
                         @if($user->profession)
-                            <p class="text-indigo-200 text-center mb-6 text-lg">{{ $user->profession->name }}</p>
+                            <p class="text-indigo-200 text-center mb-6 text-lg">{{ $user->display_profession }}</p>
                         @endif
                         
                         <div class="space-y-4 border-t border-white/20 pt-6">
@@ -162,7 +162,7 @@
                                             </div>
                                             <div>
                                                 <p class="text-sm font-medium text-gray-500">Meslek</p>
-                                                <p class="text-base font-semibold text-gray-900">{{ $user->profession->name }}</p>
+                                                <p class="text-base font-semibold text-gray-900">{{ $user->display_profession }}</p>
                                             </div>
                                         </div>
                                     </div>

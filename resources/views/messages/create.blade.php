@@ -23,7 +23,7 @@
                                     </a>
                                 </p>
                                 @if($user->profession)
-                                    <p class="text-blue-600">{{ $user->profession->name }}</p>
+                                    <p class="text-blue-600">{{ $user->display_profession }}</p>
                                 @endif
                                 @if($user->current_city)
                                     <p class="text-gray-600">{{ $user->current_city }}{{ $user->current_district ? ', ' . $user->current_district : '' }}</p>

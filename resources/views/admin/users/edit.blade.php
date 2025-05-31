@@ -32,7 +32,7 @@
                         <!-- Meslek -->
                         <div>
                             <label for="profession_id" class="block text-sm font-medium text-gray-700 mb-2">Meslek</label>
-                            <select name="profession_id" id="profession_id" class="w-full border-gray-300 rounded-md shadow-sm">
+                            <select name="profession_id" id="profession_id" class="w-full border-gray-300 rounded-md shadow-sm" onchange="toggleRetirementDetailAdmin()">
                                 <option value="">Meslek Seçin</option>
                                 @foreach($professions as $profession)
                                     <option value="{{ $profession->id }}" {{ old('profession_id', $user->profession_id) == $profession->id ? 'selected' : '' }}>
@@ -40,6 +40,14 @@
                                     </option>
                                 @endforeach
                             </select>
+                        </div>
+
+                        <!-- Retirement Detail -->
+                        <div id="retirement_detail_div_admin" style="display: {{ old('profession_id', $user->profession_id) == 82 ? 'block' : 'none' }};">
+                            <label for="retirement_detail" class="block text-sm font-medium text-gray-700 mb-2">Ne Emeklisi? (Opsiyonel)</label>
+                            <input type="text" name="retirement_detail" id="retirement_detail" value="{{ old('retirement_detail', $user->retirement_detail) }}" 
+                                   class="w-full border-gray-300 rounded-md shadow-sm" placeholder="Örn: Doktor, Öğretmen, Polis...">
+                            <p class="text-sm text-gray-500 mt-1">Emekli olmadan önceki mesleğini yazabilirsiniz.</p>
                         </div>
 
                         <!-- Doğum Yılı -->
@@ -108,4 +116,17 @@
             </div>
         </div>
     </div>
+
+    <script>
+        function toggleRetirementDetailAdmin() {
+            const retirementDetailDiv = document.getElementById('retirement_detail_div_admin');
+            const selectedProfession = document.getElementById('profession_id').value;
+            
+            if (selectedProfession === '82') { // Emekli profession ID
+                retirementDetailDiv.style.display = 'block';
+            } else {
+                retirementDetailDiv.style.display = 'none';
+            }
+        }
+    </script>
 </x-app-layout> 

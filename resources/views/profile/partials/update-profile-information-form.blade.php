@@ -107,7 +107,7 @@
             <!-- Meslek -->
             <div>
                 <x-input-label for="profession_id" value="Meslek" />
-                <select id="profession_id" name="profession_id" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                <select id="profession_id" name="profession_id" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" onchange="toggleRetirementDetailProfile()">
                     <option value="">Meslek Seçin</option>
                     @foreach($professions as $profession)
                         <option value="{{ $profession->id }}" {{ old('profession_id', $user->profession_id) == $profession->id ? 'selected' : '' }}>
@@ -116,6 +116,14 @@
                     @endforeach
                 </select>
                 <x-input-error class="mt-2" :messages="$errors->get('profession_id')" />
+            </div>
+
+            <!-- Retirement Detail -->
+            <div id="retirement_detail_div_profile" style="display: {{ old('profession_id', $user->profession_id) == 82 ? 'block' : 'none' }};">
+                <x-input-label for="retirement_detail" value="Ne Emeklisi? (Opsiyonel)" />
+                <x-text-input id="retirement_detail" name="retirement_detail" type="text" class="mt-1 block w-full" :value="old('retirement_detail', $user->retirement_detail)" placeholder="Örn: Doktor, Öğretmen, Polis..." />
+                <x-input-error class="mt-2" :messages="$errors->get('retirement_detail')" />
+                <small class="text-muted">Emekli olmadan önceki mesleğinizi yazabilirsiniz.</small>
             </div>
 
             <!-- Doğum Yılı -->
@@ -239,7 +247,21 @@
             }
         }
         
+        function toggleRetirementDetailProfile() {
+            const retirementDetailDiv = document.getElementById('retirement_detail_div_profile');
+            const selectedProfession = document.getElementById('profession_id').value;
+            
+            if (selectedProfession === '82') {
+                retirementDetailDiv.style.display = 'block';
+            } else {
+                retirementDetailDiv.style.display = 'none';
+            }
+        }
+        
         // Sayfa yüklendiğinde çalıştır
-        document.addEventListener('DOMContentLoaded', updateDistrictsProfile);
+        document.addEventListener('DOMContentLoaded', function() {
+            updateDistrictsProfile();
+            toggleRetirementDetailProfile(); // Emekli alanını kontrol et
+        });
     </script>
 </section>

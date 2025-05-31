@@ -108,9 +108,9 @@
     <footer class="bg-gray-800 text-white py-8">
         <div class="max-w-6xl mx-auto px-4 text-center">
             <p>&copy; 2025 Vezirköprüm.com.tr - Tüm hakları saklıdır.</p>
-            <p class="text-gray-400 text-xs mt-2">
+            <p class="text-gray-300 text-sm mt-3">
                 <a href="https://www.resulkorkmaz.com" target="_blank" rel="noopener noreferrer" 
-                   class="hover:text-blue-400 transition duration-300">
+                   class="text-blue-400 hover:text-blue-300 transition duration-300 font-medium">
                     RK Dijital Reklam Ajansı
                 </a>
             </p>

@@ -203,7 +203,7 @@
                                             </h4>
                                             
                                             @if($user->profession)
-                                                <p class="text-rose-600 font-semibold mb-2">{{ $user->profession->name }}</p>
+                                                <p class="text-blue-600 text-sm font-medium">{{ $user->display_profession }}</p>
                                             @endif
                                             
                                             @if($user->current_city)

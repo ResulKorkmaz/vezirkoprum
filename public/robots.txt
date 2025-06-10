@@ -1,2 +1,19 @@
 User-agent: *
-Disallow:
+Allow: /
+
+# Sitemap
+Sitemap: https://vezirkoprum.com.tr/sitemap.xml
+
+# Disallow admin areas
+Disallow: /admin/
+Disallow: /api/
+Disallow: /storage/
+
+# Allow important pages
+Allow: /register
+Allow: /login
+Allow: /whatsapp
+Allow: /profile/
+
+# Crawl-delay
+Crawl-delay: 1

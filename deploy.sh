@@ -19,9 +19,13 @@ npm run build
 echo "📥 GitHub'dan son değişiklikler çekiliyor..."
 ssh -i $SSH_KEY -p $SSH_PORT $USER@$HOST "cd $REMOTE_ROOT && git pull origin main"
 
+# Public klasörünün tüm içeriğini senkronize et
+echo "📁 Public klasörü senkronize ediliyor..."
+ssh -i $SSH_KEY -p $SSH_PORT $USER@$HOST "cd $REMOTE_ROOT && rsync -av --delete public/ public_html/"
+
 # Build dosyalarını upload et
 echo "📤 Build dosyaları upload ediliyor..."
-scp -i $SSH_KEY -P $SSH_PORT -r public/build/* $USER@$HOST:$REMOTE_ROOT/public/build/
+scp -i $SSH_KEY -P $SSH_PORT -r public/build/* $USER@$HOST:$REMOTE_DIR/build/
 
 # Composer install (platform requirements ignore)
 echo "📦 Composer dependencies kuruluyor..."
@@ -32,7 +36,7 @@ echo "🗄️ Database migration'ları çalıştırılıyor..."
 ssh -i $SSH_KEY -p $SSH_PORT $USER@$HOST "cd $REMOTE_ROOT && php artisan migrate --force"
 
 # Cache'leri temizle ve oluştur
-echo "🧹 Cache'ler temizleniyor ve oluşturuluyor..."
+echo "🧹 Cache'ler temizleniyor ve oluşturuyor..."
 ssh -i $SSH_KEY -p $SSH_PORT $USER@$HOST "cd $REMOTE_ROOT && \
     php artisan config:clear && \
     php artisan route:clear && \

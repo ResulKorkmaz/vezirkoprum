@@ -1,5 +1,5 @@
 <x-guest-layout>
-    <form method="POST" action="{{ route('register') }}">
+    <form method="POST" action="{{ route('register') }}" id="registerForm">
         @csrf
 
         <div class="grid grid-cols-1 gap-4">
@@ -20,7 +20,7 @@
             <!-- Profession -->
             <div>
                 <x-input-label for="profession_id" value="Meslek *" />
-                <select id="profession_id" name="profession_id" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required onchange="toggleRetirementDetail()">
+                <select id="profession_id" name="profession_id" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
                     <option value="">Meslek Seçin</option>
                     @foreach(\App\Models\Profession::where('is_active', true)->orderBy('name')->get() as $profession)
                         <option value="{{ $profession->id }}" {{ old('profession_id') == $profession->id ? 'selected' : '' }}>
@@ -31,12 +31,11 @@
                 <x-input-error :messages="$errors->get('profession_id')" class="mt-2" />
             </div>
 
-            <!-- Retirement Detail (Hidden by default) -->
-            <div id="retirement_detail_div" style="display: none;">
-                <x-input-label for="retirement_detail" value="Ne Emeklisi? (Opsiyonel)" />
-                <x-text-input id="retirement_detail" name="retirement_detail" type="text" class="mt-1 block w-full" :value="old('retirement_detail')" placeholder="Örn: Doktor, Öğretmen, Polis..." />
+            <!-- Retirement Detail (conditionally shown) -->
+            <div id="retirement_detail_container" style="display: none;">
+                <x-input-label for="retirement_detail" value="Emeklilik Detayı" />
+                <x-text-input id="retirement_detail" class="block mt-1 w-full" type="text" name="retirement_detail" :value="old('retirement_detail')" placeholder="Örn: Emekli Öğretmen, Emekli Polis vb." />
                 <x-input-error :messages="$errors->get('retirement_detail')" class="mt-2" />
-                <p class="text-sm text-gray-600 mt-1">Emekli olmadan önceki mesleğinizi yazabilirsiniz.</p>
             </div>
 
             <!-- City -->
@@ -102,12 +101,18 @@
             <x-input-error :messages="$errors->get('kvkk_consent')" class="mt-2" />
         </div>
 
+        <!-- reCAPTCHA -->
+        <div class="mt-4">
+            <x-recaptcha action="register" />
+            <x-input-error :messages="$errors->get('recaptcha_token')" class="mt-2" />
+        </div>
+
         <div class="flex items-center justify-between mt-6">
             <a class="underline text-sm text-rose-600 hover:text-rose-700 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-rose-500 font-medium" href="{{ route('login') }}">
                 Zaten hesabınız var mı? Giriş Yapın
             </a>
 
-            <x-primary-button class="ms-4">
+            <x-primary-button class="ms-4" id="registerSubmitBtn">
                 Kayıt Ol
             </x-primary-button>
         </div>
@@ -135,44 +140,111 @@
     </div>
 
     <script>
-        const citiesRegister = @json(config('turkiye.cities'));
-        
+        // reCAPTCHA yüklenene kadar bekle
+        function waitForRecaptcha() {
+            return new Promise((resolve) => {
+                if (window.recaptchaReady && typeof addRecaptchaToForm === 'function') {
+                    resolve();
+                } else {
+                    setTimeout(() => waitForRecaptcha().then(resolve), 100);
+                }
+            });
+        }
+
+        // Form submit'te reCAPTCHA token ekle
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('registerSubmitBtn');
+            const originalText = submitBtn.innerHTML;
+            
+            // Buton durumunu değiştir
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = 'Kayıt Olunuyor...';
+            
+            try {
+                // reCAPTCHA'nın yüklenmesini bekle
+                await waitForRecaptcha();
+                
+                // reCAPTCHA token ekle
+                await addRecaptchaToForm(this, 'register');
+                
+                // Formu gönder
+                this.submit();
+            } catch (error) {
+                console.error('reCAPTCHA error:', error);
+                alert('Güvenlik doğrulaması başarısız. Lütfen tekrar deneyin.');
+                
+                // Buton durumunu eski haline getir
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        });
+
+        // Meslek seçimi değiştiğinde emeklilik detayını göster/gizle
+        document.getElementById('profession_id').addEventListener('change', function() {
+            const retirementContainer = document.getElementById('retirement_detail_container');
+            const retirementInput = document.getElementById('retirement_detail');
+            
+            if (this.value === '1') { // Emekli seçeneğinin ID'si 1 olduğunu varsayıyoruz
+                retirementContainer.style.display = 'block';
+                retirementInput.required = true;
+            } else {
+                retirementContainer.style.display = 'none';
+                retirementInput.required = false;
+                retirementInput.value = '';
+            }
+        });
+
+        // Sayfa yüklendiğinde mevcut seçimi kontrol et
+        document.addEventListener('DOMContentLoaded', function() {
+            const professionSelect = document.getElementById('profession_id');
+            if (professionSelect.value === '1') {
+                document.getElementById('retirement_detail_container').style.display = 'block';
+                document.getElementById('retirement_detail').required = true;
+            }
+        });
+
+        // İlçe güncelleme fonksiyonu
         function updateDistrictsRegister() {
             const citySelect = document.getElementById('current_city');
             const districtSelect = document.getElementById('current_district');
             const selectedCity = citySelect.value;
             
-            // İlçe seçimini temizle
+            // İlçe seçeneklerini temizle
             districtSelect.innerHTML = '<option value="">İlçe Seçin</option>';
             
-            if (selectedCity && citiesRegister[selectedCity]) {
-                citiesRegister[selectedCity].forEach(district => {
+            if (selectedCity) {
+                const cities = @json(config('turkiye.cities'));
+                const districts = cities[selectedCity] || [];
+                
+                districts.forEach(function(district) {
                     const option = document.createElement('option');
                     option.value = district;
                     option.textContent = district;
-                    if ('{{ old("current_district") }}' === district) {
+                    
+                    // Eski seçimi koru
+                    if (district === '{{ old('current_district') }}') {
                         option.selected = true;
                     }
+                    
                     districtSelect.appendChild(option);
                 });
             }
         }
-        
-        // Sayfa yüklendiğinde çalıştır
+
+        // Sayfa yüklendiğinde ilçeleri güncelle
         document.addEventListener('DOMContentLoaded', function() {
             updateDistrictsRegister();
-            toggleRetirementDetail(); // Emekli alanını kontrol et
-        });
-
-        function toggleRetirementDetail() {
-            const professionSelect = document.getElementById('profession_id');
-            const retirementDetailDiv = document.getElementById('retirement_detail_div');
             
-            if (professionSelect.value === '82') { // Emekli profession ID
-                retirementDetailDiv.style.display = 'block';
-            } else {
-                retirementDetailDiv.style.display = 'none';
-            }
-        }
+            // reCAPTCHA debug bilgileri
+            setTimeout(() => {
+                console.log('reCAPTCHA Debug:');
+                console.log('- window.recaptchaReady:', window.recaptchaReady);
+                console.log('- typeof grecaptcha:', typeof grecaptcha);
+                console.log('- typeof addRecaptchaToForm:', typeof addRecaptchaToForm);
+                console.log('- typeof getRecaptchaToken:', typeof getRecaptchaToken);
+            }, 2000);
+        });
     </script>
 </x-guest-layout>

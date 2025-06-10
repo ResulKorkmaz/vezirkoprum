@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Rules\RecaptchaRule;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -38,6 +39,7 @@ class RegisteredUserController extends Controller
             'current_city' => ['required', 'string'],
             'current_district' => ['required', 'string'],
             'kvkk_consent' => ['required', 'accepted'],
+            'recaptcha_token' => [new RecaptchaRule('register')],
         ], [
             'name.required' => 'Ad soyad alanı zorunludur.',
             'email.required' => 'E-posta alanı zorunludur.',

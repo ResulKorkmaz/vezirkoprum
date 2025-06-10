@@ -1,11 +1,11 @@
 <section>
-    <header class="mb-4">
-        <h2 class="h5 mb-2">
-            Profil Bilgileri
+    <header>
+        <h2 class="text-lg font-medium text-gray-900">
+            {{ __('Profil Bilgileri') }}
         </h2>
 
-        <p class="text-muted">
-            Hesap bilgilerinizi, iletişim bilgilerinizi ve yaşadığınız şehir bilgilerinizi güncelleyin.
+        <p class="mt-1 text-sm text-gray-600">
+            {{ __('Hesap profil bilgilerinizi ve e-posta adresinizi güncelleyin.') }}
         </p>
     </header>
 
@@ -13,47 +13,42 @@
         @csrf
     </form>
 
-    <form method="post" action="{{ route('profile.update') }}" class="mt-6" enctype="multipart/form-data">
+    <form method="post" action="{{ route('profile.update') }}" class="mt-6 space-y-6" enctype="multipart/form-data">
         @csrf
         @method('patch')
 
-        <!-- Profil Resmi Bölümü -->
-        <div class="card mb-4">
-            <div class="card-body">
-                <h5 class="card-title mb-3">
-                    <i class="bi bi-camera-fill me-2"></i>Profil Resmi
-                </h5>
-                
-                <div class="row align-items-center">
-                    <!-- Mevcut Profil Resmi -->
-                    <div class="col-auto">
-                        <img class="rounded-circle border shadow-sm" 
-                             style="width: 80px; height: 80px; object-fit: cover;"
-                             src="{{ $user->getVisibleProfilePhotoUrl($user) }}" 
-                             alt="Profil Resmi" 
-                             id="profile-preview"
-                             onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRTVFN0VCIi8+CjxwYXRoIGQ9Ik01MCA0MEMzNy45NSA0MCAyOCAzNS4wNSAyOCAyOUM4IDIzIDEyLjk1IDE4IDI1IDE4SDE4QzMwLjA1IDE4IDM1IDIzIDM1IDI5QzM1IDM1LjA1IDMwLjA1IDQwIDI1IDQwSDUwWk01MCA1MEMzNy45NSA1MCAyOCA1NS4wNSAyOCA2MUM4IDY3IDEyLjk1IDcyIDI1IDcySDE4QzMwLjA1IDcyIDM1IDY3IDM1IDYxQzM1IDU1LjA1IDMwLjA1IDUwIDI1IDUwSDUwWiIgZmlsbD0iIzlDQTNBRiIvPgo8L3N2Zz4K'">
+        <!-- Profil Fotoğrafı -->
+        <div>
+            <x-input-label for="profile_photo" :value="__('Profil Fotoğrafı')" />
+            
+            <!-- Mevcut profil fotoğrafı -->
+            @if(auth()->user()->profile_photo_path)
+                <div class="mt-2 mb-4">
+                    <img src="{{ asset('storage/' . auth()->user()->profile_photo_path) }}" 
+                         alt="Profil Fotoğrafı" 
+                         class="w-20 h-20 rounded-full object-cover border-2 border-gray-300">
                     </div>
-                    
-                    <!-- Profil Resmi Upload -->
-                    <div class="col">
-                        <div class="d-flex align-items-center gap-3 mb-2">
-                            <label for="profile_photo" class="btn btn-outline-primary">
-                                <i class="bi bi-camera me-2"></i>Resim Seç
-                            </label>
-                            <input id="profile_photo" name="profile_photo" type="file" class="d-none" accept="image/*" onchange="previewPhoto(this)">
-                            <small class="text-muted">JPG, PNG, GIF (Max: 10MB - otomatik optimize edilir)</small>
+            @endif
+            
+            <input type="file" 
+                   id="profile_photo" 
+                   name="profile_photo" 
+                   accept="image/*"
+                   class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" />
+            
+            <!-- Önizleme -->
+            <div id="preview-container" class="mt-4 hidden">
+                <img id="preview-image" class="w-20 h-20 rounded-full object-cover border-2 border-gray-300" alt="Önizleme">
                         </div>
-                        @error('profile_photo')
-                            <div class="text-danger small">{{ $message }}</div>
-                        @enderror
-                    </div>
+            
+            <x-input-error class="mt-2" :messages="$errors->get('profile_photo')" />
+            <p class="mt-1 text-sm text-gray-500">JPG, PNG veya GIF formatında, maksimum 10MB</p>
                 </div>
                 
-                <!-- Profil Resmi Görünürlük Ayarları -->
-                <div class="mt-3">
-                    <label for="profile_photo_visibility" class="form-label">Profil Resmi Görünürlüğü</label>
-                    <select id="profile_photo_visibility" name="profile_photo_visibility" class="form-select">
+        <!-- Profil Fotoğrafı Görünürlük -->
+        <div>
+            <x-input-label for="profile_photo_visibility" :value="__('Profil Fotoğrafı Görünürlüğü')" />
+            <select id="profile_photo_visibility" name="profile_photo_visibility" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                         <option value="members_only" {{ old('profile_photo_visibility', $user->profile_photo_visibility) == 'members_only' ? 'selected' : '' }}>
                             👥 Sadece Üyeler Görebilir
                         </option>
@@ -64,40 +59,36 @@
                             🔒 Sadece Ben Görebilirim
                         </option>
                     </select>
-                    @error('profile_photo_visibility')
-                        <div class="text-danger small mt-1">{{ $message }}</div>
-                    @enderror
-                </div>
-            </div>
+            <x-input-error class="mt-2" :messages="$errors->get('profile_photo_visibility')" />
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- Ad Soyad -->
         <div>
-                <x-input-label for="name" value="Ad Soyad *" />
+                <x-input-label for="name" :value="__('Ad Soyad *')" />
             <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" :value="old('name', $user->name)" required autofocus autocomplete="name" />
             <x-input-error class="mt-2" :messages="$errors->get('name')" />
         </div>
 
             <!-- E-posta -->
         <div>
-                <x-input-label for="email" value="E-posta *" />
+                <x-input-label for="email" :value="__('E-posta *')" />
             <x-text-input id="email" name="email" type="email" class="mt-1 block w-full" :value="old('email', $user->email)" required autocomplete="username" />
             <x-input-error class="mt-2" :messages="$errors->get('email')" />
 
             @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! $user->hasVerifiedEmail())
                 <div>
                     <p class="text-sm mt-2 text-gray-800">
-                            E-posta adresiniz doğrulanmamış.
+                            {{ __('E-posta adresiniz doğrulanmamış.') }}
 
                         <button form="send-verification" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                Doğrulama e-postası göndermek için tıklayın.
+                                {{ __('Doğrulama e-postasını tekrar gönder.') }}
                         </button>
                     </p>
 
                     @if (session('status') === 'verification-link-sent')
                         <p class="mt-2 font-medium text-sm text-green-600">
-                                E-posta adresinize yeni bir doğrulama bağlantısı gönderildi.
+                                {{ __('E-posta adresinize yeni bir doğrulama bağlantısı gönderildi.') }}
                         </p>
                     @endif
                 </div>
@@ -106,8 +97,8 @@
 
             <!-- Meslek -->
             <div>
-                <x-input-label for="profession_id" value="Meslek" />
-                <select id="profession_id" name="profession_id" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" onchange="toggleRetirementDetailProfile()">
+                <x-input-label for="profession_id" :value="__('Meslek')" />
+                <select id="profession_id" name="profession_id" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" onchange="toggleRetirementDetail()">
                     <option value="">Meslek Seçin</option>
                     @foreach($professions as $profession)
                         <option value="{{ $profession->id }}" {{ old('profession_id', $user->profession_id) == $profession->id ? 'selected' : '' }}>
@@ -118,40 +109,32 @@
                 <x-input-error class="mt-2" :messages="$errors->get('profession_id')" />
             </div>
 
-            <!-- Retirement Detail -->
-            <div id="retirement_detail_div_profile" style="display: {{ old('profession_id', $user->profession_id) == 82 ? 'block' : 'none' }};">
-                <x-input-label for="retirement_detail" value="Ne Emeklisi? (Opsiyonel)" />
+            <!-- Emekli Detayı -->
+            <div id="retirement_detail_div" style="display: {{ old('profession_id', $user->profession_id) == 82 ? 'block' : 'none' }};">
+                <x-input-label for="retirement_detail" :value="__('Ne Emeklisi? (Opsiyonel)')" />
                 <x-text-input id="retirement_detail" name="retirement_detail" type="text" class="mt-1 block w-full" :value="old('retirement_detail', $user->retirement_detail)" placeholder="Örn: Doktor, Öğretmen, Polis..." />
                 <x-input-error class="mt-2" :messages="$errors->get('retirement_detail')" />
-                <small class="text-muted">Emekli olmadan önceki mesleğinizi yazabilirsiniz.</small>
+                <p class="mt-1 text-sm text-gray-500">Emekli olmadan önceki mesleğinizi yazabilirsiniz.</p>
             </div>
 
             <!-- Doğum Yılı -->
             <div>
-                <x-input-label for="birth_year" value="Doğum Tarihi" />
-                <div class="input-group">
-                    <span class="input-group-text">
-                        <i class="bi bi-calendar-heart"></i>
-                    </span>
-                    <input id="birth_date" 
-                           name="birth_date" 
-                           type="date" 
-                           class="form-control" 
-                           value="{{ old('birth_date', $user->birth_year ? $user->birth_year . '-01-01' : '') }}"
-                           min="1900-01-01" 
-                           max="{{ date('Y-m-d') }}"
-                           onchange="updateBirthYear(this.value)">
-                </div>
-                <!-- Hidden field to store birth year -->
-                <input type="hidden" id="birth_year" name="birth_year" value="{{ old('birth_year', $user->birth_year) }}">
+                <x-input-label for="birth_year" :value="__('Doğum Yılı')" />
+                <select id="birth_year" name="birth_year" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                    <option value="">Doğum Yılı Seçin</option>
+                    @for($year = date('Y'); $year >= 1940; $year--)
+                        <option value="{{ $year }}" {{ old('birth_year', $user->birth_year) == $year ? 'selected' : '' }}>
+                            {{ $year }}
+                        </option>
+                    @endfor
+                </select>
                 <x-input-error class="mt-2" :messages="$errors->get('birth_year')" />
-                <small class="text-muted">Sadece doğum yılınız kaydedilir ve görüntülenir</small>
             </div>
 
             <!-- Şehir -->
             <div>
-                <x-input-label for="current_city" value="Yaşadığınız Şehir" />
-                <select id="current_city" name="current_city" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" onchange="updateDistrictsProfile()">
+                <x-input-label for="current_city" :value="__('Yaşadığınız Şehir')" />
+                <select id="current_city" name="current_city" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" onchange="updateDistricts()">
                     <option value="">Şehir Seçin</option>
                     @foreach($cities as $cityName => $districts)
                         <option value="{{ $cityName }}" {{ old('current_city', $user->current_city) == $cityName ? 'selected' : '' }}>
@@ -164,7 +147,7 @@
 
             <!-- İlçe -->
             <div>
-                <x-input-label for="current_district" value="İlçe" />
+                <x-input-label for="current_district" :value="__('İlçe')" />
                 <select id="current_district" name="current_district" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                     <option value="">İlçe Seçin</option>
                 </select>
@@ -173,9 +156,10 @@
 
             <!-- Telefon -->
             <div>
-                <x-input-label for="phone" value="Telefon Numarası" />
+                <x-input-label for="phone" :value="__('Telefon Numarası')" />
                 <x-text-input id="phone" name="phone" type="text" class="mt-1 block w-full" :value="old('phone', $user->phone)" autocomplete="tel" placeholder="0555 123 45 67" />
                 <x-input-error class="mt-2" :messages="$errors->get('phone')" />
+            </div>
             </div>
 
             <!-- Telefon Gösterimi -->
@@ -185,38 +169,74 @@
                 <label for="show_phone" class="ml-2 text-sm text-gray-600">
                     📞 Telefon numaramı herkese göster
                 </label>
-            </div>
         </div>
 
         <!-- Hakkımda -->
-        <div class="mt-6">
-            <x-input-label for="bio" value="Hakkımda" />
+        <div>
+            <x-input-label for="bio" :value="__('Hakkımda')" />
             <textarea id="bio" name="bio" rows="4" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" placeholder="Kendinizi kısaca tanıtın...">{{ old('bio', $user->bio) }}</textarea>
             <x-input-error class="mt-2" :messages="$errors->get('bio')" />
             <p class="mt-1 text-sm text-gray-500">Maksimum 1000 karakter</p>
         </div>
 
-        <div class="flex items-center gap-4 mt-8">
-            <x-primary-button class="px-6 py-3">
-                💾 Kaydet
-            </x-primary-button>
+        <div class="flex items-center gap-4">
+            <x-primary-button>{{ __('Kaydet') }}</x-primary-button>
 
-            @if (session('status') === 'profile-updated')
+            @if (session('status'))
                 <p
                     x-data="{ show: true }"
                     x-show="show"
                     x-transition
-                    x-init="setTimeout(() => show = false, 3000)"
-                    class="text-sm text-green-600 bg-green-50 px-3 py-2 rounded-md border border-green-200"
-                >✅ Profil başarıyla güncellendi!</p>
+                    x-init="setTimeout(() => show = false, 2000)"
+                    class="text-sm text-green-600"
+                >{{ session('status') }}</p>
+            @endif
+            
+            @if (session('error'))
+                <p class="text-sm text-red-600">{{ session('error') }}</p>
             @endif
         </div>
     </form>
+</section>
 
     <script>
-        const citiesProfile = @json($cities);
+const cities = @json($cities);
         
-        function updateDistrictsProfile() {
+document.getElementById('profile_photo').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    const previewContainer = document.getElementById('preview-container');
+    const previewImage = document.getElementById('preview-image');
+    
+    if (file) {
+        // Dosya boyutu kontrolü (10MB)
+        if (file.size > 10 * 1024 * 1024) {
+            alert('Dosya boyutu 10MB\'dan büyük olamaz.');
+            e.target.value = '';
+            previewContainer.classList.add('hidden');
+            return;
+        }
+        
+        // Dosya tipi kontrolü
+        if (!file.type.startsWith('image/')) {
+            alert('Lütfen bir resim dosyası seçin.');
+            e.target.value = '';
+            previewContainer.classList.add('hidden');
+            return;
+        }
+        
+        // Önizleme göster
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            previewImage.src = e.target.result;
+            previewContainer.classList.remove('hidden');
+        };
+        reader.readAsDataURL(file);
+    } else {
+        previewContainer.classList.add('hidden');
+    }
+});
+
+function updateDistricts() {
             const citySelect = document.getElementById('current_city');
             const districtSelect = document.getElementById('current_district');
             const selectedCity = citySelect.value;
@@ -224,8 +244,8 @@
             // İlçe seçimini temizle
             districtSelect.innerHTML = '<option value="">İlçe Seçin</option>';
             
-            if (selectedCity && citiesProfile[selectedCity]) {
-                citiesProfile[selectedCity].forEach(district => {
+    if (selectedCity && cities[selectedCity]) {
+        cities[selectedCity].forEach(district => {
                     const option = document.createElement('option');
                     option.value = district;
                     option.textContent = district;
@@ -237,18 +257,8 @@
             }
         }
         
-        function previewPhoto(input) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('profile-preview').src = e.target.result;
-                }
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-        
-        function toggleRetirementDetailProfile() {
-            const retirementDetailDiv = document.getElementById('retirement_detail_div_profile');
+function toggleRetirementDetail() {
+    const retirementDetailDiv = document.getElementById('retirement_detail_div');
             const selectedProfession = document.getElementById('profession_id').value;
             
             if (selectedProfession === '82') {
@@ -258,10 +268,9 @@
             }
         }
         
-        // Sayfa yüklendiğinde çalıştır
+// Sayfa yüklendiğinde ilçeleri güncelle
         document.addEventListener('DOMContentLoaded', function() {
-            updateDistrictsProfile();
-            toggleRetirementDetailProfile(); // Emekli alanını kontrol et
+    updateDistricts();
+    toggleRetirementDetail();
         });
     </script>
-</section>

@@ -17,8 +17,13 @@
     <body class="font-sans text-gray-900 antialiased">
         <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100">
             <div>
-                <a href="/">
-                    <div class="text-4xl font-bold text-blue-600 mb-4">Vezirköprüm</div>
+                <a href="/" class="flex items-center space-x-4 group">
+                    <div class="w-14 h-14 bg-gradient-to-br from-rose-50 to-pink-50 border border-rose-100 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105 overflow-hidden">
+                        <img src="{{ asset('images/logo.png') }}" alt="Vezirköprüm Logo" class="w-11 h-11 object-contain">
+                    </div>
+                    <span class="text-3xl font-black text-rose-700 tracking-tight hover:text-rose-800 transition-colors duration-200">
+                        Vezirköprüm
+                    </span>
                 </a>
             </div>
 

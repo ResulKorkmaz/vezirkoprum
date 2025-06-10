@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Profession;
+use App\Models\Post;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -49,6 +50,23 @@ class HomeController extends Controller
         $professions = Profession::where('is_active', true)->orderBy('name')->get();
         $cities = config('turkiye.cities');
         
-        return view('home', compact('users', 'professions', 'cities', 'hasFilters'));
+        // En yeni 6 paylaşımı getir
+        $posts = Post::with('user')
+            ->active()
+            ->latest()
+            ->limit(6)
+            ->get();
+        
+        // Giriş yapmış kullanıcı için günlük paylaşım bilgisi
+        $userPostInfo = null;
+        if (auth()->check()) {
+            $userPostInfo = [
+                'daily_count' => Post::getUserDailyPostCount(auth()->id()),
+                'remaining_posts' => Post::getUserRemainingPosts(auth()->id()),
+                'daily_limit' => 3
+            ];
+        }
+        
+        return view('home', compact('users', 'professions', 'cities', 'hasFilters', 'posts', 'userPostInfo'));
     }
 }

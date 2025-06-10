@@ -3,10 +3,12 @@
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\MessageController;
+use App\Http\Controllers\PostController;
 use App\Http\Controllers\WhatsappController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\AdminController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 
 // Ana sayfa - herkese açık
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -48,6 +50,14 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     
+    // Paylaşımlar
+    Route::prefix('posts')->name('posts.')->group(function () {
+        Route::get('/', [PostController::class, 'index'])->name('index');
+        Route::get('/create', [PostController::class, 'create'])->name('create');
+        Route::post('/', [PostController::class, 'store'])->name('store');
+        Route::get('/remaining', [PostController::class, 'getRemainingPosts'])->name('remaining');
+    });
+    
     // Mesajlaşma
     Route::prefix('messages')->name('messages.')->group(function () {
         Route::get('/', [MessageController::class, 'index'])->name('index');
@@ -56,6 +66,12 @@ Route::middleware('auth')->group(function () {
         Route::get('/{message}', [MessageController::class, 'show'])->name('show');
         Route::delete('/{message}', [MessageController::class, 'destroy'])->name('destroy');
         Route::delete('/', [MessageController::class, 'bulkDelete'])->name('bulk-delete');
+    });
+    
+    // Bildiriler
+    Route::prefix('reports')->name('reports.')->group(function () {
+        Route::get('/create', [\App\Http\Controllers\ReportController::class, 'create'])->name('create');
+        Route::post('/', [\App\Http\Controllers\ReportController::class, 'store'])->name('store');
     });
     
     // WhatsApp grupları - sadece görüntüleme
@@ -67,6 +83,16 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
     Route::post('/logout', [AdminController::class, 'logout'])->name('logout');
     Route::resource('whatsapp', WhatsappController::class);
+    
+    // Bildiri yönetimi
+    Route::prefix('reports')->name('reports.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\ReportManagementController::class, 'index'])->name('index');
+        Route::get('/{report}', [\App\Http\Controllers\Admin\ReportManagementController::class, 'show'])->name('show');
+        Route::patch('/{report}/status', [\App\Http\Controllers\Admin\ReportManagementController::class, 'updateStatus'])->name('update-status');
+        Route::patch('/{report}/toggle-content', [\App\Http\Controllers\Admin\ReportManagementController::class, 'toggleContent'])->name('toggle-content');
+        Route::delete('/{report}', [\App\Http\Controllers\Admin\ReportManagementController::class, 'destroy'])->name('destroy');
+        Route::post('/bulk-action', [\App\Http\Controllers\Admin\ReportManagementController::class, 'bulkAction'])->name('bulk-action');
+    });
     
     // Kullanıcı yönetimi
     Route::prefix('users')->name('users.')->group(function () {
@@ -104,5 +130,49 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::delete('/{user}', [\App\Http\Controllers\Admin\UserManagementController::class, 'destroy'])->name('destroy');
     });
 });
+
+// Sitemap for SEO
+Route::get('/sitemap.xml', function () {
+    $sitemap = '<?xml version="1.0" encoding="UTF-8"?>';
+    $sitemap .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
+    
+    // Homepage
+    $sitemap .= '<url>';
+    $sitemap .= '<loc>https://vezirkoprum.com.tr/</loc>';
+    $sitemap .= '<lastmod>' . now()->toISOString() . '</lastmod>';
+    $sitemap .= '<changefreq>daily</changefreq>';
+    $sitemap .= '<priority>1.0</priority>';
+    $sitemap .= '</url>';
+    
+    // Register page
+    $sitemap .= '<url>';
+    $sitemap .= '<loc>https://vezirkoprum.com.tr/register</loc>';
+    $sitemap .= '<lastmod>' . now()->toISOString() . '</lastmod>';
+    $sitemap .= '<changefreq>monthly</changefreq>';
+    $sitemap .= '<priority>0.8</priority>';
+    $sitemap .= '</url>';
+    
+    // Login page
+    $sitemap .= '<url>';
+    $sitemap .= '<loc>https://vezirkoprum.com.tr/login</loc>';
+    $sitemap .= '<lastmod>' . now()->toISOString() . '</lastmod>';
+    $sitemap .= '<changefreq>monthly</changefreq>';
+    $sitemap .= '<priority>0.7</priority>';
+    $sitemap .= '</url>';
+    
+    // WhatsApp groups page
+    $sitemap .= '<url>';
+    $sitemap .= '<loc>https://vezirkoprum.com.tr/whatsapp</loc>';
+    $sitemap .= '<lastmod>' . now()->toISOString() . '</lastmod>';
+    $sitemap .= '<changefreq>weekly</changefreq>';
+    $sitemap .= '<priority>0.9</priority>';
+    $sitemap .= '</url>';
+    
+    $sitemap .= '</urlset>';
+    
+    return response($sitemap, 200, [
+        'Content-Type' => 'application/xml'
+    ]);
+})->name('sitemap');
 
 require __DIR__.'/auth.php';

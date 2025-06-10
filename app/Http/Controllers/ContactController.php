@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Message;
+use App\Rules\RecaptchaRule;
 use Illuminate\Support\Facades\Validator;
 
 class ContactController extends Controller
@@ -17,6 +18,7 @@ class ContactController extends Controller
             'email' => 'required|email|max:255',
             'subject' => 'required|string|max:255',
             'message' => 'required|string|max:2000',
+            'recaptcha_token' => [new RecaptchaRule('contact')],
         ], [
             'name.required' => 'Ad soyad alanı zorunludur.',
             'email.required' => 'E-posta alanı zorunludur.',

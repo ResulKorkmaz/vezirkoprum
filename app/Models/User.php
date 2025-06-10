@@ -31,7 +31,7 @@ class User extends Authenticatable
         'show_phone',
         'birth_year',
         'bio',
-        'profile_photo',
+        'profile_photo_path',
         'profile_photo_visibility',
         'kvkk_consent',
         'kvkk_consent_date',
@@ -114,6 +114,11 @@ class User extends Authenticatable
         return $this->hasMany(Message::class, 'receiver_id');
     }
 
+    public function posts()
+    {
+        return $this->hasMany(Post::class);
+    }
+
     /**
      * Telefon şifreleme/deşifreleme
      */
@@ -174,8 +179,8 @@ class User extends Authenticatable
      */
     public function getProfilePhotoUrlAttribute()
     {
-        if ($this->profile_photo) {
-            return asset('storage/profile-photos/' . $this->profile_photo);
+        if ($this->profile_photo_path) {
+            return asset('storage/' . $this->profile_photo_path);
         }
         return 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRTVFN0VCIi8+CjxjaXJjbGUgY3g9IjUwIiBjeT0iMzUiIHI9IjE1IiBmaWxsPSIjOUNBM0FGIi8+CjxwYXRoIGQ9Ik0yNSA4NUMyNSA3MCAzNSA2MCA1MCA2MEM2NSA2MCA3NSA3MCA3NSA4NSIgc3Ryb2tlPSIjOUNBM0FGIiBzdHJva2Utd2lkdGg9IjMiIGZpbGw9Im5vbmUiLz4KPC9zdmc+';
     }
@@ -185,7 +190,7 @@ class User extends Authenticatable
      */
     public function canSeeProfilePhoto($viewer = null)
     {
-        if (!$this->profile_photo) {
+        if (!$this->profile_photo_path) {
             return false;
         }
 

@@ -2,7 +2,7 @@
     <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
-    <form method="POST" action="{{ route('login') }}">
+    <form method="POST" action="{{ route('login') }}" id="loginForm">
         @csrf
 
         <!-- Email or Phone -->
@@ -33,6 +33,12 @@
             </label>
         </div>
 
+        <!-- reCAPTCHA -->
+        <div class="mt-4">
+            <x-recaptcha action="login" />
+            <x-input-error :messages="$errors->get('recaptcha_token')" class="mt-2" />
+        </div>
+
         <div class="flex items-center justify-between mt-4">
             <div class="flex items-center space-x-4">
                 @if (Route::has('password.request'))
@@ -49,7 +55,7 @@
                 @endif
             </div>
 
-            <x-primary-button class="ms-3">
+            <x-primary-button class="ms-3" id="loginSubmitBtn">
                 Giriş Yap
             </x-primary-button>
         </div>
@@ -75,4 +81,33 @@
             </a>
         </div>
     </div>
+
+    <script>
+        // Form submit'te reCAPTCHA token ekle
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('loginSubmitBtn');
+            const originalText = submitBtn.innerHTML;
+            
+            // Buton durumunu değiştir
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = 'Giriş Yapılıyor...';
+            
+            try {
+                // reCAPTCHA token ekle
+                await addRecaptchaToForm(this, 'login');
+                
+                // Formu gönder
+                this.submit();
+            } catch (error) {
+                console.error('reCAPTCHA error:', error);
+                alert('Güvenlik doğrulaması başarısız. Lütfen tekrar deneyin.');
+                
+                // Buton durumunu eski haline getir
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        });
+    </script>
 </x-guest-layout>

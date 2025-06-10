@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Gd\Driver;
+use Illuminate\Support\Facades\Log;
 
 class ProfileController extends Controller
 {
@@ -47,63 +48,54 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
+        try {
         $user = $request->user();
-        $validated = $request->validated();
-        
-        // Profil resmi upload ve optimizasyon işlemi
-        if ($request->hasFile('profile_photo')) {
-            // Eski resmi sil
-            if ($user->profile_photo) {
-                Storage::delete('public/profile-photos/' . $user->profile_photo);
+            
+            // Profil bilgilerini güncelle
+            $user->fill($request->validated());
+
+            if ($user->isDirty('email')) {
+                $user->email_verified_at = null;
             }
-            
+
+            // Profil fotoğrafı yükleme
+        if ($request->hasFile('profile_photo')) {
             $file = $request->file('profile_photo');
-            $filename = time() . '_' . $user->id . '.jpg'; // Her zaman JPG olarak kaydet
-            $filepath = storage_path('app/public/profile-photos/' . $filename);
+                
+                // Eski profil fotoğrafını sil
+                if ($user->profile_photo_path) {
+                    Storage::disk('public')->delete($user->profile_photo_path);
+                }
+                
+                // Yeni dosya adı oluştur
+                $filename = time() . '_' . $user->id . '.jpg';
+                $path = 'profile-photos/' . $filename;
             
-            // Resmi optimize et (Intervention Image v3 syntax)
+                // Resmi işle ve kaydet
             $manager = new ImageManager(new Driver());
             $image = $manager->read($file->getPathname());
             
-            // 400x400 boyutuna resize et
-            $image->resize(400, 400);
+                // Resmi 400x400 boyutuna getir ve optimize et
+                $image->cover(400, 400);
             
-            // JPEG olarak kaydet ve kaliteyi optimize et
-            $quality = 85; // Başlangıç kalitesi
-            $maxSize = 200 * 1024; // 200KB limit
-            
-            do {
-                // Resmi encode et
-                $encoded = $image->toJpeg($quality);
+                // Kaliteyi ayarla (dosya boyutunu küçültmek için)
+                $processedImage = $image->toJpeg(80);
                 
-                // Eğer boyut çok büyükse kaliteyi düşür
-                if (strlen($encoded) > $maxSize && $quality > 60) {
-                    $quality -= 5;
-                } else {
-                    break;
-                }
-            } while ($quality >= 60);
+                // Storage'a kaydet
+                Storage::disk('public')->put($path, $processedImage);
             
-            // Dosyayı kaydet
-            file_put_contents($filepath, $encoded);
-            
-            $validated['profile_photo'] = $filename;
-            
-            // Log the final file size for debugging
-            $finalSize = filesize($filepath);
-            \Log::info("Profile photo optimized: {$filename}, Size: " . number_format($finalSize / 1024, 2) . " KB, Quality: {$quality}%");
-    }
+                // Veritabanında path'i güncelle
+                $user->profile_photo_path = $path;
+            }
 
-        // E-posta değişti mi kontrol et
-        if ($user->isDirty('email')) {
-            $user->email_verified_at = null;
+            $user->save();
+
+            return Redirect::route('profile.edit')->with('status', 'Profil başarıyla güncellendi!');
+            
+        } catch (\Exception $e) {
+            Log::error('Profile update error: ' . $e->getMessage());
+            return Redirect::route('profile.edit')->with('error', 'Profil güncellenirken bir hata oluştu: ' . $e->getMessage());
         }
-        
-        // Kullanıcı bilgilerini güncelle
-        $user->fill($validated);
-        $user->save();
-
-        return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
 
     /**
@@ -117,9 +109,9 @@ class ProfileController extends Controller
 
         $user = $request->user();
 
-        // Profil resmini sil
-        if ($user->profile_photo) {
-            Storage::delete('public/profile-photos/' . $user->profile_photo);
+        // Profil fotoğrafını sil
+        if ($user->profile_photo_path) {
+            Storage::disk('public')->delete($user->profile_photo_path);
         }
 
         Auth::logout();

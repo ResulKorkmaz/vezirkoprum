@@ -211,7 +211,7 @@
                 <!-- İlk Satır - İlk 3 Paylaşım -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                     @foreach($posts->take(3) as $post)
-                        <div class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 relative">
+                        <div class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 relative flex flex-col h-full">
                             <!-- Kullanıcı Bilgisi -->
                             <div class="flex items-center justify-between mb-4">
                                 <div class="flex items-center">
@@ -265,7 +265,7 @@
                             </div>
                             
                             <!-- Paylaşım İçeriği -->
-                            <div class="text-gray-600 text-sm leading-relaxed">
+                            <div class="text-gray-600 text-sm leading-relaxed flex-1">
                                 <p id="post-content-{{ $post->id }}">
                                     "{{ Str::limit($post->content, 120) }}"
                                 </p>
@@ -282,7 +282,7 @@
                             </div>
                             
                             <!-- Alt Bilgi -->
-                            <div class="mt-4 pt-4 border-t border-gray-100">
+                            <div class="mt-auto pt-4 border-t border-gray-100">
                                 @if($post->user->current_city)
                                     <p class="text-xs text-gray-400">
                                         {{ $post->user->current_city }}{{ $post->user->current_district ? ', ' . $post->user->current_district : '' }}
@@ -407,7 +407,7 @@
                 @if($posts->count() > 3)
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         @foreach($posts->skip(3)->take(3) as $post)
-                            <div class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 relative">
+                            <div class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 relative flex flex-col h-full">
                                 <!-- Kullanıcı Bilgisi -->
                                 <div class="flex items-center justify-between mb-4">
                                     <div class="flex items-center">
@@ -461,7 +461,7 @@
                                 </div>
                                 
                                 <!-- Paylaşım İçeriği -->
-                                <div class="text-gray-600 text-sm leading-relaxed">
+                                <div class="text-gray-600 text-sm leading-relaxed flex-1">
                                     <p id="post-content-{{ $post->id }}">
                                         "{{ Str::limit($post->content, 120) }}"
                                     </p>
@@ -478,7 +478,7 @@
                                 </div>
                                 
                                 <!-- Alt Bilgi -->
-                                <div class="mt-4 pt-4 border-t border-gray-100">
+                                <div class="mt-auto pt-4 border-t border-gray-100">
                                     @if($post->user->current_city)
                                         <p class="text-xs text-gray-400">
                                             {{ $post->user->current_city }}{{ $post->user->current_district ? ', ' . $post->user->current_district : '' }}

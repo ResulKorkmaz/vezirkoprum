@@ -37,7 +37,7 @@
                 <!-- Paylaşımlar Grid -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
                     @foreach($posts as $post)
-                        <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 p-6 border border-gray-100 hover:border-rose-200 relative">
+                        <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 p-6 border border-gray-100 hover:border-rose-200 relative flex flex-col h-full">
                             <!-- Kullanıcı Bilgisi -->
                             <div class="flex items-center justify-between mb-4">
                                 <div class="flex items-center">
@@ -93,7 +93,7 @@
                             </div>
 
                             <!-- Paylaşım İçeriği -->
-                            <div class="text-gray-700 text-sm leading-relaxed mb-4 min-h-[60px]">
+                            <div class="text-gray-700 text-sm leading-relaxed mb-4 flex-1">
                                 <p id="post-content-{{ $post->id }}">
                                     {{ Str::limit($post->content, 120) }}
                                 </p>
@@ -110,7 +110,7 @@
                             </div>
 
                             <!-- Alt Bilgiler -->
-                            <div class="flex items-center justify-between pt-4 border-t border-gray-100">
+                            <div class="flex items-center justify-between pt-4 border-t border-gray-100 mt-auto">
                                 <div class="flex items-center space-x-3">
                                     <!-- Tarih -->
                                     <p class="text-xs text-gray-400">

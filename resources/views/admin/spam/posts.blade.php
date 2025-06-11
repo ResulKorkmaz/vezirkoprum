@@ -147,7 +147,7 @@
         <!-- Posts Table -->
         <div class="bg-white shadow-sm rounded-xl border border-gray-200">
             <div class="px-6 py-4 border-b border-gray-200">
-                <h3 class="text-lg font-medium text-gray-900">Postlar ({{ $posts->total() }})</h3>
+                <h3 class="text-lg font-medium text-gray-900">Postlar ({{ $posts instanceof \Illuminate\Pagination\LengthAwarePaginator ? $posts->total() : $posts->count() }})</h3>
             </div>
 
             <div class="overflow-x-auto">
@@ -297,7 +297,7 @@
             </div>
 
             <!-- Pagination -->
-            @if($posts->hasPages())
+            @if(method_exists($posts, 'hasPages') && $posts->hasPages())
                 <div class="px-6 py-4 border-t border-gray-200">
                     {{ $posts->appends(request()->query())->links() }}
                 </div>

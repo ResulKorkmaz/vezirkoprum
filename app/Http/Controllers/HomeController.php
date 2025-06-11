@@ -16,8 +16,11 @@ class HomeController extends Controller
             ->whereNotNull('email_verified_at') // Email doğrulaması yapılmış kullanıcılar
             ->where('is_suspended', false); // Suspended olmayan kullanıcılar
         
-        // Filtre var mı kontrol et
-        $hasFilters = $request->hasAny(['city', 'district', 'profession_id', 'show_all']);
+        // Filtre var mı kontrol et (show_all hariç)
+        $hasFilters = $request->hasAny(['city', 'district', 'profession_id']);
+        
+        // show_all parametresi varsa tüm kullanıcıları göster
+        $showAll = $request->has('show_all');
         
         // Şehir filtresi
         if ($request->filled('city')) {
@@ -34,8 +37,14 @@ class HomeController extends Controller
             $query->where('profession_id', $request->profession_id);
         }
         
-        // Filtre yoksa sadece ilk 8 üyeyi göster, varsa pagination kullan
-        if (!$hasFilters) {
+        // show_all varsa veya filtre varsa pagination kullan, yoksa sadece ilk 8 üyeyi göster
+        if ($showAll || $hasFilters) {
+            $users = $query->paginate(12);
+            // show_all için hasFilters'ı true yap ki başlık "Hemşehrilerimiz" olsun
+            if ($showAll && !$hasFilters) {
+                $hasFilters = true;
+            }
+        } else {
             $users = $query->orderBy('created_at', 'desc')->limit(8)->get();
             // Collection'ı paginator gibi göstermek için
             $users = new \Illuminate\Pagination\LengthAwarePaginator(
@@ -48,8 +57,6 @@ class HomeController extends Controller
                 1,
                 ['path' => request()->url()]
             );
-        } else {
-            $users = $query->paginate(12);
         }
         
         $professions = Profession::where('is_active', true)->orderBy('name')->get();

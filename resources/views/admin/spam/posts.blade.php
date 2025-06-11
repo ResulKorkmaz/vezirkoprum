@@ -76,7 +76,7 @@
                         <div class="ml-5 w-0 flex-1">
                             <dl>
                                 <dt class="text-sm font-medium text-gray-500 truncate">Spam Postlar</dt>
-                                <dd class="text-lg font-medium text-gray-900">{{ $posts->where('is_spam', true)->count() }}</dd>
+                                <dd class="text-lg font-medium text-gray-900">{{ $stats['spam'] }}</dd>
                             </dl>
                         </div>
                     </div>
@@ -96,7 +96,7 @@
                         <div class="ml-5 w-0 flex-1">
                             <dl>
                                 <dt class="text-sm font-medium text-gray-500 truncate">Şüpheli</dt>
-                                <dd class="text-lg font-medium text-gray-900">{{ $posts->where('spam_status', 'suspicious')->count() }}</dd>
+                                <dd class="text-lg font-medium text-gray-900">{{ $stats['suspicious'] }}</dd>
                             </dl>
                         </div>
                     </div>
@@ -116,7 +116,7 @@
                         <div class="ml-5 w-0 flex-1">
                             <dl>
                                 <dt class="text-sm font-medium text-gray-500 truncate">Karantina</dt>
-                                <dd class="text-lg font-medium text-gray-900">{{ $posts->where('spam_status', 'quarantined')->count() }}</dd>
+                                <dd class="text-lg font-medium text-gray-900">{{ $stats['quarantined'] }}</dd>
                             </dl>
                         </div>
                     </div>
@@ -136,40 +136,9 @@
                         <div class="ml-5 w-0 flex-1">
                             <dl>
                                 <dt class="text-sm font-medium text-gray-500 truncate">Temiz</dt>
-                                <dd class="text-lg font-medium text-gray-900">{{ $posts->where('spam_status', 'clean')->count() }}</dd>
+                                <dd class="text-lg font-medium text-gray-900">{{ $stats['clean'] }}</dd>
                             </dl>
                         </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Bulk Actions -->
-        <div class="bg-white shadow-sm rounded-xl border border-gray-200 mb-6">
-            <div class="p-4">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center space-x-4">
-                        <input type="checkbox" id="selectAll" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                        <label for="selectAll" class="text-sm font-medium text-gray-700">Tümünü Seç</label>
-                        <span id="selectedCount" class="text-sm text-gray-500">0 seçili</span>
-                    </div>
-                    <div class="flex space-x-2" id="bulkActions" style="display: none;">
-                        <button onclick="bulkAction('approve')" 
-                                class="px-3 py-1 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors duration-200">
-                            Onayla
-                        </button>
-                        <button onclick="bulkAction('spam')" 
-                                class="px-3 py-1 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition-colors duration-200">
-                            Spam
-                        </button>
-                        <button onclick="bulkAction('quarantine')" 
-                                class="px-3 py-1 bg-orange-600 text-white text-sm rounded-lg hover:bg-orange-700 transition-colors duration-200">
-                            Karantina
-                        </button>
-                        <button onclick="bulkAction('delete')" 
-                                class="px-3 py-1 bg-gray-600 text-white text-sm rounded-lg hover:bg-gray-700 transition-colors duration-200">
-                            Sil
-                        </button>
                     </div>
                 </div>
             </div>
@@ -337,28 +306,6 @@
     </div>
 
     <script>
-    // Checkbox handling
-    document.getElementById('selectAll').addEventListener('change', function() {
-        const checkboxes = document.querySelectorAll('.post-checkbox');
-        checkboxes.forEach(checkbox => {
-            checkbox.checked = this.checked;
-        });
-        updateSelectedCount();
-    });
-
-    document.addEventListener('change', function(e) {
-        if (e.target.classList.contains('post-checkbox')) {
-            updateSelectedCount();
-        }
-    });
-
-    function updateSelectedCount() {
-        const checkboxes = document.querySelectorAll('.post-checkbox:checked');
-        const count = checkboxes.length;
-        document.getElementById('selectedCount').textContent = count + ' seçili';
-        document.getElementById('bulkActions').style.display = count > 0 ? 'flex' : 'none';
-    }
-
     // Individual post actions
     function updatePostStatus(postId, action) {
         const actionMap = {
@@ -406,50 +353,6 @@
                     location.reload();
                 } else {
                     alert('Hata: ' + (data.message || 'Post silinemedi'));
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Bir hata oluştu');
-            });
-        }
-    }
-
-    // Bulk actions
-    function bulkAction(action) {
-        const checkboxes = document.querySelectorAll('.post-checkbox:checked');
-        const postIds = Array.from(checkboxes).map(cb => cb.value);
-        
-        if (postIds.length === 0) {
-            alert('Lütfen en az bir post seçin');
-            return;
-        }
-
-        const actionText = {
-            'approve': 'onaylamak',
-            'spam': 'spam olarak işaretlemek',
-            'quarantine': 'karantinaya almak',
-            'delete': 'silmek'
-        };
-
-        if (confirm(`${postIds.length} postu ${actionText[action]} istediğinizden emin misiniz?`)) {
-            fetch('/admin/spam/posts/bulk', {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    action: action,
-                    post_ids: postIds
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    location.reload();
-                } else {
-                    alert('Hata: ' + data.message);
                 }
             })
             .catch(error => {

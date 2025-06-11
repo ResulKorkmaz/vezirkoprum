@@ -72,8 +72,16 @@ class SpamController extends Controller
         }
 
         $posts = $query->latest()->paginate(20);
+        
+        // Stats için ayrı hesaplama
+        $stats = [
+            'spam' => Post::where('is_spam', true)->count(),
+            'suspicious' => Post::where('spam_status', 'suspicious')->count(),
+            'quarantined' => Post::where('spam_status', 'quarantined')->count(),
+            'clean' => Post::where('spam_status', 'clean')->count(),
+        ];
 
-        return view('admin.spam.posts', compact('posts'));
+        return view('admin.spam.posts', compact('posts', 'stats'));
     }
 
     /**

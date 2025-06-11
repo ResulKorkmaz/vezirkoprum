@@ -258,35 +258,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Telefon numarası ile kullanıcı bulma
-     */
-    public static function findByPhone($phone)
-    {
-        // Telefon numarasını temizle (boşluk, tire, parantez kaldır)
-        $cleanPhone = preg_replace('/[\s\-\(\)]/', '', $phone);
-        
-        // Tüm kullanıcıları gez ve telefon numaralarını decrypt et
-        $users = self::whereNotNull('phone')->get();
-        
-        foreach ($users as $user) {
-            try {
-                $decryptedPhone = Crypt::decryptString($user->attributes['phone']);
-                $cleanDecryptedPhone = preg_replace('/[\s\-\(\)]/', '', $decryptedPhone);
-                
-                if ($cleanDecryptedPhone === $cleanPhone) {
-                    return $user;
-                }
-            } catch (\Exception $e) {
-                // Decrypt hatası durumunda devam et
-                continue;
-            }
-        }
-        
-        return null;
-    }
-
-    /**
-     * E-posta veya telefon ile kullanıcı bulma
+     * E-posta veya kullanıcı ID ile kullanıcı bulma
      */
     public static function findByEmailOrPhone($identifier)
     {
@@ -296,13 +268,7 @@ class User extends Authenticatable
         }
         
         // Kullanıcı adı (unique_user_id) ile ara
-        $userByUsername = self::where('unique_user_id', $identifier)->first();
-        if ($userByUsername) {
-            return $userByUsername;
-        }
-        
-        // Telefon numarası olarak ara
-        return self::findByPhone($identifier);
+        return self::where('unique_user_id', $identifier)->first();
     }
 
     /**

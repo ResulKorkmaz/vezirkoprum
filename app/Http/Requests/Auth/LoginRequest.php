@@ -42,7 +42,7 @@ class LoginRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'login.required' => 'E-posta veya telefon numarası gereklidir.',
+            'login.required' => 'E-posta veya kullanıcı ID gereklidir.',
             'password.required' => 'Şifre gereklidir.',
         ];
     }

@@ -5,10 +5,10 @@
     <form method="POST" action="{{ route('login') }}" id="loginForm">
         @csrf
 
-        <!-- Email or Phone -->
+        <!-- Email or User ID -->
         <div>
-            <x-input-label for="login" value="E-posta veya Telefon" />
-            <x-text-input id="login" class="block mt-1 w-full" type="text" name="login" :value="old('login')" required autofocus autocomplete="username" placeholder="ornek@email.com veya 0555 123 45 67" />
+            <x-input-label for="login" value="E-posta veya Kullanıcı ID" />
+            <x-text-input id="login" class="block mt-1 w-full" type="text" name="login" :value="old('login')" required autofocus autocomplete="username" placeholder="ornek@email.com veya #55900" />
             <x-input-error :messages="$errors->get('login')" class="mt-2" />
             <x-input-error :messages="$errors->get('email')" class="mt-2" />
         </div>

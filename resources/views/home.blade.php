@@ -547,17 +547,65 @@
                             @endif
                         </h3>
                         @if(!$hasFilters)
-                            <a href="{{ route('hemsehriler.index') }}" 
-                               class="font-semibold text-sm transition-colors duration-200" 
-                               style="color: #B76E79;" 
-                               onmouseover="this.style.color='#A85D68'" 
-                               onmouseout="this.style.color='#B76E79'">
-                                Tümünü Gör →
-                            </a>
+                            @auth
+                                <a href="{{ route('hemsehriler.index') }}" 
+                                   class="font-semibold text-sm transition-colors duration-200" 
+                                   style="color: #B76E79;" 
+                                   onmouseover="this.style.color='#A85D68'" 
+                                   onmouseout="this.style.color='#B76E79'">
+                                    Tümünü Gör →
+                                </a>
+                            @else
+                                <a href="{{ route('login') }}" 
+                                   class="font-semibold text-sm transition-colors duration-200 flex items-center" 
+                                   style="color: #B76E79;" 
+                                   onmouseover="this.style.color='#A85D68'" 
+                                   onmouseout="this.style.color='#B76E79'"
+                                   title="Tüm hemşehrileri görmek için giriş yapın">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                                    </svg>
+                                    Tümünü Görmek İçin Giriş Yapın →
+                                </a>
+                            @endauth
                         @endif
                     </div>
                     
                     @if($users->count() > 0)
+                        @guest
+                            <!-- Giriş yapmamış kullanıcılar için uyarı -->
+                            <div class="mb-6 p-4 rounded-lg border-2 border-dashed" style="border-color: rgba(183, 110, 121, 0.3); background-color: rgba(183, 110, 121, 0.05);">
+                                <div class="flex items-center justify-center text-center">
+                                    <div>
+                                        <svg class="w-8 h-8 mx-auto mb-2" style="color: #B76E79;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                                        </svg>
+                                        <h4 class="font-semibold text-gray-900 mb-1">Tüm Hemşehrilerimizi Görmek İçin</h4>
+                                        <p class="text-sm text-gray-600 mb-3">Ücretsiz üye olun ve binlerce hemşehrinizle tanışın!</p>
+                                        <div class="flex gap-2 justify-center">
+                                            <a href="{{ route('register') }}" 
+                                               class="inline-flex items-center px-4 py-2 text-white text-sm font-semibold rounded-lg transition-colors" 
+                                               style="background-color: #B76E79;" 
+                                               onmouseover="this.style.backgroundColor='#A85D68'" 
+                                               onmouseout="this.style.backgroundColor='#B76E79'">
+                                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
+                                                </svg>
+                                                Ücretsiz Kayıt Ol
+                                            </a>
+                                            <a href="{{ route('login') }}" 
+                                               class="inline-flex items-center px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 text-sm font-semibold rounded-lg transition-colors">
+                                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                                                </svg>
+                                                Giriş Yap
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endguest
+                        
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                             @foreach($users as $index => $user)
                                 <div class="border rounded-xl p-6 hover:shadow-xl transition-all duration-300 relative flex flex-col min-h-[400px]" style="border-color: rgba(183, 110, 121, 0.2); background: linear-gradient(to bottom right, white, rgba(183, 110, 121, 0.03));" onmouseover="this.style.borderColor='rgba(183, 110, 121, 0.4)'" onmouseout="this.style.borderColor='rgba(183, 110, 121, 0.2)'">

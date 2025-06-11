@@ -14,9 +14,6 @@ use Illuminate\Http\Request;
 // Ana sayfa - herkese açık
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
-// Hemşehriler sayfası
-Route::get('/hemsehriler', [HomeController::class, 'hemsehriler'])->name('hemsehriler.index');
-
 // Gizlilik Politikası - herkese açık
 Route::get('/privacy', function () {
     return view('privacy');
@@ -56,6 +53,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    
+    // Hemşehriler sayfası - sadece üyeler görebilir
+    Route::get('/hemsehriler', [HomeController::class, 'hemsehriler'])->name('hemsehriler.index');
     
     // Paylaşımlar
     Route::prefix('posts')->name('posts.')->group(function () {

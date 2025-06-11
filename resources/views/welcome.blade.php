@@ -223,11 +223,11 @@
             <h2 class="text-3xl font-bold text-center text-gray-900 mb-12">Vezirköprü Hemşehri Ağımız</h2>
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
                 <div class="text-center bg-white p-6 rounded-2xl shadow-lg">
-                    <div class="text-4xl font-bold text-rose-600 mb-2">{{ \App\Models\User::where('is_admin', false)->count() }}</div>
-                    <div class="text-gray-600">Kayıtlı Vezirköprülü Hemşehri</div>
+                    <div class="text-4xl font-bold text-rose-600 mb-2">{{ \App\Models\User::where('is_admin', false)->whereNotNull('email_verified_at')->where('is_suspended', false)->count() }}</div>
+                    <div class="text-gray-600">Aktif Vezirköprülü Hemşehri</div>
                 </div>
                 <div class="text-center bg-white p-6 rounded-2xl shadow-lg">
-                    <div class="text-4xl font-bold text-blue-600 mb-2">{{ \App\Models\User::where('is_admin', false)->whereNotNull('current_city')->distinct('current_city')->count() }}</div>
+                    <div class="text-4xl font-bold text-blue-600 mb-2">{{ \App\Models\User::where('is_admin', false)->whereNotNull('email_verified_at')->where('is_suspended', false)->whereNotNull('current_city')->distinct('current_city')->count() }}</div>
                     <div class="text-gray-600">Farklı Şehirde Yaşayan</div>
                 </div>
                 <div class="text-center bg-white p-6 rounded-2xl shadow-lg">
@@ -235,7 +235,7 @@
                     <div class="text-gray-600">Farklı Meslek Dalı</div>
                 </div>
                 <div class="text-center bg-white p-6 rounded-2xl shadow-lg">
-                    <div class="text-4xl font-bold text-purple-600 mb-2">{{ \App\Models\User::where('is_admin', false)->where('created_at', '>=', now()->subDays(30))->count() }}</div>
+                    <div class="text-4xl font-bold text-purple-600 mb-2">{{ \App\Models\User::where('is_admin', false)->whereNotNull('email_verified_at')->where('is_suspended', false)->where('created_at', '>=', now()->subDays(30))->count() }}</div>
                     <div class="text-gray-600">Son 30 Günde Katılan</div>
                 </div>
             </div>

@@ -12,7 +12,9 @@ class HomeController extends Controller
     public function index(Request $request)
     {
         $query = User::with('profession')
-            ->where('is_admin', false); // Admin kullanıcıları hariç tut
+            ->where('is_admin', false) // Admin kullanıcıları hariç tut
+            ->whereNotNull('email_verified_at') // Email doğrulaması yapılmış kullanıcılar
+            ->where('is_suspended', false); // Suspended olmayan kullanıcılar
         
         // Filtre var mı kontrol et
         $hasFilters = $request->hasAny(['city', 'district', 'profession_id', 'show_all']);
@@ -38,7 +40,10 @@ class HomeController extends Controller
             // Collection'ı paginator gibi göstermek için
             $users = new \Illuminate\Pagination\LengthAwarePaginator(
                 $users,
-                User::where('is_admin', false)->count(), // Admin hariç toplam sayı
+                User::where('is_admin', false)
+                    ->whereNotNull('email_verified_at')
+                    ->where('is_suspended', false)
+                    ->count(), // Aktif kullanıcı sayısı
                 8,
                 1,
                 ['path' => request()->url()]

@@ -55,30 +55,13 @@ class SpamController extends Controller
      */
     public function posts(Request $request)
     {
-        $query = Post::with('user');
-
-        // Filtreleme
-        if ($request->has('status') && $request->status !== 'all') {
-            if ($request->status === 'spam') {
-                $query->where('is_spam', true);
-            } else {
-                $query->where('spam_status', $request->status);
-            }
-        }
-
-        // Arama
-        if ($request->has('search') && $request->search) {
-            $query->where('content', 'like', '%' . $request->search . '%');
-        }
-
-        $posts = $query->latest()->paginate(20);
-        
-        // Stats için ayrı hesaplama
+        // Basit test için
+        $posts = collect([]); // Boş collection
         $stats = [
-            'spam' => Post::where('is_spam', true)->count(),
-            'suspicious' => Post::where('spam_status', 'suspicious')->count(),
-            'quarantined' => Post::where('spam_status', 'quarantined')->count(),
-            'clean' => Post::where('spam_status', 'clean')->count(),
+            'spam' => 0,
+            'suspicious' => 0,
+            'quarantined' => 0,
+            'clean' => 0,
         ];
 
         return view('admin.spam.posts', compact('posts', 'stats'));

@@ -517,12 +517,11 @@
                             @endif
                         </h3>
                         @if(!$hasFilters)
-                            <a href="{{ route('home') }}?show_all=1#hemşehriler" 
+                            <a href="{{ route('home') }}?show_all=1" 
                                class="font-semibold text-sm transition-colors duration-200" 
                                style="color: #B76E79;" 
                                onmouseover="this.style.color='#A85D68'" 
-                               onmouseout="this.style.color='#B76E79'"
-                               onclick="setTimeout(() => { document.getElementById('hemşehriler').scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 100);">
+                               onmouseout="this.style.color='#B76E79'">
                                 Tümünü Gör →
                             </a>
                         @endif
@@ -1690,19 +1689,30 @@
         }
 
         // Sayfa yüklendiğinde show_all parametresi varsa hemşehriler bölümüne scroll yap
-        document.addEventListener('DOMContentLoaded', function() {
+        function scrollToHemsehriler() {
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.has('show_all')) {
-                setTimeout(() => {
-                    const hemsehrilerSection = document.getElementById('hemşehriler');
-                    if (hemsehrilerSection) {
+                const hemsehrilerSection = document.getElementById('hemşehriler');
+                if (hemsehrilerSection) {
+                    // Sayfanın en üstüne git, sonra smooth scroll yap
+                    window.scrollTo(0, 0);
+                    setTimeout(() => {
                         hemsehrilerSection.scrollIntoView({ 
                             behavior: 'smooth', 
                             block: 'start' 
                         });
-                    }
-                }, 500); // Sayfa tamamen yüklendikten sonra scroll yap
+                    }, 500);
+                }
             }
-        });
+        }
+
+        // Birden fazla event ile dene
+        document.addEventListener('DOMContentLoaded', scrollToHemsehriler);
+        window.addEventListener('load', scrollToHemsehriler);
+        
+        // Eğer sayfa zaten yüklenmişse hemen çalıştır
+        if (document.readyState === 'complete') {
+            scrollToHemsehriler();
+        }
     </script>
 </x-app-layout>

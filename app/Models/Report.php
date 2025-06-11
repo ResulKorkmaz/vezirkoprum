@@ -57,6 +57,9 @@ class Report extends Model
     public static function getReasons(): array
     {
         return [
+            'sexual_assault' => 'Cinsel Saldırı',
+            'violence_and_profanity' => 'Şiddet ve Küfür',
+            'other' => 'Diğer',
             'spam' => 'Spam/Reklam',
             'inappropriate' => 'Uygunsuz İçerik',
             'harassment' => 'Taciz/Zorbalık',
@@ -64,7 +67,6 @@ class Report extends Model
             'hate_speech' => 'Nefret Söylemi',
             'violence' => 'Şiddet İçeriği',
             'copyright' => 'Telif Hakkı İhlali',
-            'other' => 'Diğer',
         ];
     }
 

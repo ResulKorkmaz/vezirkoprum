@@ -51,7 +51,7 @@ class PostController extends Controller
         // Validasyon
         $request->validate([
             'content' => 'required|string|min:10|max:500',
-            'recaptcha_token' => [new RecaptchaRule('post')],
+            'recaptcha_token' => [new RecaptchaRule('post_create')],
         ], [
             'content.required' => 'Paylaşım içeriği gereklidir.',
             'content.min' => 'Paylaşım en az 10 karakter olmalıdır.',
@@ -93,6 +93,87 @@ class PostController extends Controller
             'remaining_posts' => $remainingPosts,
             'daily_count' => $dailyCount,
             'daily_limit' => 3
+        ]);
+    }
+
+    /**
+     * Paylaşımı düzenle (AJAX)
+     */
+    public function edit(Post $post)
+    {
+        // Yetki kontrolü
+        if ($post->user_id !== Auth::id()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Bu paylaşımı düzenleme yetkiniz yok.'
+            ], 403);
+        }
+
+        return response()->json([
+            'success' => true,
+            'post' => [
+                'id' => $post->id,
+                'content' => $post->content,
+            ]
+        ]);
+    }
+
+    /**
+     * Paylaşımı güncelle
+     */
+    public function update(Request $request, Post $post)
+    {
+        // Yetki kontrolü
+        if ($post->user_id !== Auth::id()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Bu paylaşımı düzenleme yetkiniz yok.'
+            ], 403);
+        }
+
+        // Validasyon
+        $request->validate([
+            'content' => 'required|string|min:10|max:500',
+        ], [
+            'content.required' => 'Paylaşım içeriği gereklidir.',
+            'content.min' => 'Paylaşım en az 10 karakter olmalıdır.',
+            'content.max' => 'Paylaşım en fazla 500 karakter olabilir.',
+        ]);
+
+        // Paylaşımı güncelle
+        $post->update([
+            'content' => $request->content,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Paylaşımınız başarıyla güncellendi!',
+            'post' => [
+                'id' => $post->id,
+                'content' => $post->short_content,
+                'full_content' => $post->content,
+            ]
+        ]);
+    }
+
+    /**
+     * Paylaşımı sil
+     */
+    public function destroy(Post $post)
+    {
+        // Yetki kontrolü
+        if ($post->user_id !== Auth::id()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Bu paylaşımı silme yetkiniz yok.'
+            ], 403);
+        }
+
+        $post->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Paylaşımınız başarıyla silindi.'
         ]);
     }
 }

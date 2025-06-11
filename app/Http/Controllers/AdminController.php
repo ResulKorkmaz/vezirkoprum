@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use App\Models\Report;
 
 class AdminController extends Controller
 {
@@ -80,9 +81,23 @@ class AdminController extends Controller
             'verified_users' => User::whereNotNull('email_verified_at')->count(),
         ];
 
-        $recentUsers = User::where('is_admin', false)->latest()->limit(10)->get();
+        // Bildiri istatistikleri
+        $reportStats = [
+            'pending_reports' => Report::where('status', 'pending')->count(),
+            'total_reports' => Report::count(),
+            'recent_reports' => Report::where('created_at', '>=', now()->subDays(7))->count(),
+        ];
 
-        return view('admin.dashboard', compact('stats', 'recentUsers'));
+        $recentUsers = User::where('is_admin', false)->latest()->limit(10)->get();
+        
+        // Bekleyen bildiriler (en son 5 tane)
+        $pendingReports = Report::with(['reporter', 'reportable'])
+            ->where('status', 'pending')
+            ->latest()
+            ->limit(5)
+            ->get();
+
+        return view('admin.dashboard', compact('stats', 'reportStats', 'recentUsers', 'pendingReports'));
     }
 
     /**

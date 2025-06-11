@@ -9,6 +9,7 @@ use App\Rules\RecaptchaRule;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Arr;
 
 class ReportController extends Controller
 {
@@ -17,24 +18,49 @@ class ReportController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
-        $request->validate([
-            'reportable_type' => ['required', 'string', 'in:App\Models\Post,App\Models\Message,App\Models\User'],
-            'reportable_id' => ['required', 'integer'],
-            'reason' => ['required', 'string', 'in:' . implode(',', array_keys(Report::getReasons()))],
-            'description' => ['nullable', 'string', 'max:500'],
-            'recaptcha_token' => [new RecaptchaRule('report')],
-        ], [
-            'reportable_type.required' => 'İçerik türü belirtilmelidir.',
-            'reportable_type.in' => 'Geçersiz içerik türü.',
-            'reportable_id.required' => 'İçerik ID\'si belirtilmelidir.',
-            'reason.required' => 'Bildiri nedeni seçilmelidir.',
-            'reason.in' => 'Geçersiz bildiri nedeni.',
-            'description.max' => 'Açıklama en fazla 500 karakter olabilir.',
-        ]);
+        \Log::info('Report request data:', $request->all());
+        
+        try {
+            $request->validate([
+                'type' => ['required', 'string', 'in:post,message,user'],
+                'item_id' => ['required', 'integer'],
+                'reason' => ['required', 'string', 'in:' . implode(',', array_keys(Report::getReasons()))],
+                'description' => ['nullable', 'string', 'max:500'],
+            ], [
+                'type.required' => 'İçerik türü belirtilmelidir.',
+                'type.in' => 'Geçersiz içerik türü.',
+                'item_id.required' => 'İçerik ID\'si belirtilmelidir.',
+                'reason.required' => 'Bildiri nedeni seçilmelidir.',
+                'reason.in' => 'Geçersiz bildiri nedeni.',
+                'description.max' => 'Açıklama en fazla 500 karakter olabilir.',
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            \Log::error('Validation failed:', $e->errors());
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed: ' . implode(', ', Arr::flatten($e->errors())),
+                'errors' => $e->errors()
+            ], 422);
+        }
+
+        // Model class'ını belirle
+        $reportableType = match($request->type) {
+            'post' => 'App\\Models\\Post',
+            'message' => 'App\\Models\\Message',
+            'user' => 'App\\Models\\User',
+            default => null,
+        };
+
+        if (!$reportableType) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Geçersiz içerik türü.'
+            ], 400);
+        }
 
         // İçeriğin var olup olmadığını kontrol et
-        $reportableClass = $request->reportable_type;
-        $reportable = $reportableClass::find($request->reportable_id);
+        $reportableClass = $reportableType;
+        $reportable = $reportableClass::find($request->item_id);
 
         if (!$reportable) {
             return response()->json([
@@ -46,8 +72,8 @@ class ReportController extends Controller
         // Kullanıcı daha önce bu içeriği bildirmiş mi?
         $existingReport = Report::where([
             'reporter_id' => Auth::id(),
-            'reportable_type' => $request->reportable_type,
-            'reportable_id' => $request->reportable_id,
+            'reportable_type' => $reportableType,
+            'reportable_id' => $request->item_id,
         ])->first();
 
         if ($existingReport) {
@@ -68,8 +94,8 @@ class ReportController extends Controller
         // Bildiri oluştur
         $report = Report::create([
             'reporter_id' => Auth::id(),
-            'reportable_type' => $request->reportable_type,
-            'reportable_id' => $request->reportable_id,
+            'reportable_type' => $reportableType,
+            'reportable_id' => $request->item_id,
             'reason' => $request->reason,
             'description' => $request->description,
         ]);

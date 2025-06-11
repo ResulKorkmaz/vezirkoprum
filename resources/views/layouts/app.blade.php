@@ -195,100 +195,23 @@
             </div>
         </footer>
 
-        <!-- Sabit Duyuru Paylaş Butonu (Sadece giriş yapmış kullanıcılar için) -->
-        @auth
-            <div class="fixed bottom-6 right-6 z-40">
-                <button onclick="openPostModal()" 
-                        class="bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-700 hover:to-pink-700 text-white p-4 rounded-full shadow-2xl hover:shadow-3xl transform hover:scale-110 transition-all duration-300 group animate-pulse hover:animate-none">
-                    <svg class="w-6 h-6 group-hover:rotate-12 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+        <!-- Sabit Paylaşım Butonu (Sadece giriş yapmış kullanıcılar için) -->
+        <div id="floating-button-container" style="position: fixed; bottom: 24px; right: 24px; z-index: 9999;">
+            @auth
+                <a id="floating-post-button" href="{{ route('posts.create') }}"
+                   style="display: block; padding: 16px; background: linear-gradient(to right, #B76E79, #A85D68); color: white; border-radius: 50%; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); text-decoration: none; transition: all 0.3s ease; animation: pulse 2s infinite;"
+                   onmouseover="this.style.transform='scale(1.1)'; this.style.background='linear-gradient(to right, #A85D68, #9A5460)'"
+                   onmouseout="this.style.transform='scale(1)'; this.style.background='linear-gradient(to right, #B76E79, #A85D68)'">
+                    <svg style="width: 28px; height: 28px; color: white;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                     </svg>
-                    <span class="sr-only">Duyuru Paylaş</span>
-                </button>
-                
-                <!-- Tooltip -->
-                <div class="absolute bottom-full right-0 mb-2 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap pointer-events-none">
-                    Duyuru Paylaş
-                    <div class="absolute top-full right-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
-                </div>
-            </div>
-        @endauth
+                </a>
+            @endauth
+        </div>
 
-        <!-- Duyuru Paylaş Modal -->
-        @auth
-            <div id="postModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
-                <div class="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
-                    <div class="p-6">
-                        <!-- Modal Header -->
-                        <div class="flex justify-between items-center mb-6">
-                            <h3 class="text-2xl font-bold text-gray-900 flex items-center">
-                                <svg class="w-6 h-6 text-rose-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
-                                </svg>
-                                Duyuru Paylaş
-                            </h3>
-                            <button onclick="closePostModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                </svg>
-                            </button>
-                        </div>
 
-                        <!-- Günlük Limit Bilgisi -->
-                        <div id="dailyLimitInfo" class="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                            <div class="flex items-center">
-                                <svg class="w-5 h-5 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>
-                                <span class="text-sm text-blue-800">
-                                    Bugün <span id="remainingPostsCount">-</span> paylaşım hakkınız kaldı (Günlük limit: 3)
-                                </span>
-                            </div>
-                        </div>
 
-                        <!-- Post Form -->
-                        <form id="postForm" onsubmit="submitPost(event)">
-                            <div class="space-y-4">
-                                <!-- İçerik -->
-                                <div>
-                                    <label for="post_content" class="block text-sm font-semibold text-gray-700 mb-2">
-                                        Paylaşımınız *
-                                    </label>
-                                    <textarea id="post_content" name="content" rows="6" required 
-                                              class="w-full border-rose-200 rounded-lg shadow-sm focus:border-rose-500 focus:ring-rose-500 transition-colors resize-none"
-                                              placeholder="Hemşehrilerinizle paylaşmak istediğiniz duyuru, haber veya düşüncelerinizi yazın..."
-                                              maxlength="500"></textarea>
-                                    <div class="flex justify-between items-center mt-2">
-                                        <span class="text-xs text-gray-500">En az 10, en fazla 500 karakter</span>
-                                        <span id="charCount" class="text-xs text-gray-400">0/500</span>
-                                    </div>
-                                </div>
 
-                                <!-- reCAPTCHA -->
-                                <div>
-                                    <x-recaptcha action="post" />
-                                </div>
-                            </div>
-
-                            <!-- Form Buttons -->
-                            <div class="flex space-x-3 mt-6">
-                                <button type="button" onclick="closePostModal()" 
-                                        class="flex-1 px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-lg transition-colors">
-                                    İptal
-                                </button>
-                                <button type="submit" id="postSubmitBtn"
-                                        class="flex-1 px-4 py-3 bg-rose-600 hover:bg-rose-700 text-white font-semibold rounded-lg transition-colors flex items-center justify-center">
-                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
-                                    </svg>
-                                    Paylaş
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        @endauth
 
         <!-- İletişim Modal -->
         <div id="contactModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
@@ -397,9 +320,6 @@
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape') {
                     closeContactModal();
-                    @auth
-                    closePostModal();
-                    @endauth
                 }
             });
             
@@ -458,164 +378,7 @@
                 }
             }
 
-            // Duyuru Paylaş Modal Fonksiyonları
-            @auth
-            async function openPostModal() {
-                document.getElementById('postModal').classList.remove('hidden');
-                document.body.style.overflow = 'hidden';
-                
-                // Günlük limit bilgisini güncelle
-                await updateDailyLimitInfo();
-                
-                // Karakter sayacını başlat
-                updateCharCount();
-            }
-            
-            function closePostModal() {
-                document.getElementById('postModal').classList.add('hidden');
-                document.body.style.overflow = 'auto';
-                // Formu temizle
-                document.getElementById('postForm').reset();
-                updateCharCount();
-            }
-            
-            // Günlük limit bilgisini getir ve güncelle
-            async function updateDailyLimitInfo() {
-                try {
-                    const response = await fetch('{{ route("posts.remaining") }}', {
-                        headers: {
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                            'Accept': 'application/json'
-                        }
-                    });
-                    
-                    if (response.ok) {
-                        const data = await response.json();
-                        const remainingElement = document.getElementById('remainingPostsCount');
-                        const limitInfo = document.getElementById('dailyLimitInfo');
-                        const submitBtn = document.getElementById('postSubmitBtn');
-                        
-                        remainingElement.textContent = data.remaining_posts;
-                        
-                        if (data.remaining_posts === 0) {
-                            limitInfo.className = 'mb-4 p-3 bg-red-50 border border-red-200 rounded-lg';
-                            limitInfo.querySelector('svg').className = 'w-5 h-5 text-red-600 mr-2';
-                            limitInfo.querySelector('span').className = 'text-sm text-red-800';
-                            limitInfo.querySelector('span').innerHTML = 'Günlük paylaşım limitinize ulaştınız. Yarın tekrar deneyebilirsiniz.';
-                            submitBtn.disabled = true;
-                            submitBtn.className = 'flex-1 px-4 py-3 bg-gray-400 text-white font-semibold rounded-lg cursor-not-allowed flex items-center justify-center';
-                        } else {
-                            limitInfo.className = 'mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg';
-                            limitInfo.querySelector('svg').className = 'w-5 h-5 text-blue-600 mr-2';
-                            limitInfo.querySelector('span').className = 'text-sm text-blue-800';
-                            submitBtn.disabled = false;
-                            submitBtn.className = 'flex-1 px-4 py-3 bg-rose-600 hover:bg-rose-700 text-white font-semibold rounded-lg transition-colors flex items-center justify-center';
-                        }
-                    }
-                } catch (error) {
-                    console.error('Günlük limit bilgisi alınamadı:', error);
-                }
-            }
-            
-            // Karakter sayacını güncelle
-            function updateCharCount() {
-                const textarea = document.getElementById('post_content');
-                const charCount = document.getElementById('charCount');
-                
-                if (textarea && charCount) {
-                    const count = textarea.value.length;
-                    charCount.textContent = count + '/500';
-                    
-                    if (count > 500) {
-                        charCount.className = 'text-xs text-red-500';
-                    } else if (count < 10) {
-                        charCount.className = 'text-xs text-gray-400';
-                    } else {
-                        charCount.className = 'text-xs text-green-500';
-                    }
-                }
-            }
-            
-            // Textarea'ya event listener ekle
-            document.addEventListener('DOMContentLoaded', function() {
-                const textarea = document.getElementById('post_content');
-                if (textarea) {
-                    textarea.addEventListener('input', updateCharCount);
-                }
-            });
-            
-            // Paylaşım formu gönderimi
-            async function submitPost(event) {
-                event.preventDefault();
-                
-                const form = event.target;
-                const submitButton = form.querySelector('button[type="submit"]');
-                const originalText = submitButton.innerHTML;
-                
-                // Buton durumunu değiştir
-                submitButton.disabled = true;
-                submitButton.innerHTML = `
-                    <svg class="w-5 h-5 mr-2 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                    </svg>
-                    Paylaşılıyor...
-                `;
-                
-                try {
-                    // reCAPTCHA token ekle
-                    await addRecaptchaToForm(form, 'post');
-                    
-                    const formData = new FormData(form);
-                    const response = await fetch('{{ route("posts.store") }}', {
-                        method: 'POST',
-                        body: formData,
-                        headers: {
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                            'Accept': 'application/json'
-                        }
-                    });
-                    
-                    const result = await response.json();
-                    
-                    if (response.ok) {
-                        // Başarılı
-                        alert('Paylaşımınız başarıyla oluşturuldu!');
-                        closePostModal();
-                        
-                        // Sayfayı yenile (yeni paylaşımı göstermek için)
-                        if (window.location.pathname === '/') {
-                            window.location.reload();
-                        }
-                    } else {
-                        // Hata
-                        if (result.errors && result.errors.recaptcha_token) {
-                            alert('Güvenlik doğrulaması başarısız. Lütfen tekrar deneyin.');
-                        } else {
-                            alert(result.message || 'Paylaşım oluşturulurken bir hata oluştu. Lütfen tekrar deneyin.');
-                        }
-                    }
-                } catch (error) {
-                    console.error('Error:', error);
-                    alert('Bir hata oluştu. Lütfen tekrar deneyin.');
-                } finally {
-                    // Buton durumunu eski haline getir
-                    submitButton.disabled = false;
-                    submitButton.innerHTML = originalText;
-                }
-            }
-            
-            // Post modal dışına tıklandığında kapat
-            document.addEventListener('DOMContentLoaded', function() {
-                const postModal = document.getElementById('postModal');
-                if (postModal) {
-                    postModal.addEventListener('click', function(e) {
-                        if (e.target === this) {
-                            closePostModal();
-                        }
-                    });
-                }
-            });
-            @endauth
+
         </script>
     </body>
 </html>

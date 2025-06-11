@@ -14,6 +14,9 @@ use Illuminate\Http\Request;
 // Ana sayfa - herkese açık
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
+// Hemşehriler sayfası
+Route::get('/hemsehriler', [HomeController::class, 'hemsehriler'])->name('hemsehriler.index');
+
 // Gizlilik Politikası - herkese açık
 Route::get('/privacy', function () {
     return view('privacy');

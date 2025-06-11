@@ -547,7 +547,7 @@
                             @endif
                         </h3>
                         @if(!$hasFilters)
-                            <a href="{{ route('home') }}?show_all=1" 
+                            <a href="{{ route('hemsehriler.index') }}" 
                                class="font-semibold text-sm transition-colors duration-200" 
                                style="color: #B76E79;" 
                                onmouseover="this.style.color='#A85D68'" 

@@ -82,4 +82,48 @@ class HomeController extends Controller
         
         return view('home', compact('users', 'professions', 'cities', 'hasFilters', 'posts', 'userPostInfo'));
     }
+    
+    /**
+     * Hemşehriler sayfası - posts sayfası gibi modern grid layout
+     */
+    public function hemsehriler(Request $request)
+    {
+        $query = User::with('profession')
+            ->where('is_admin', false) // Admin kullanıcıları hariç tut
+            ->whereNotNull('email_verified_at') // Email doğrulaması yapılmış kullanıcılar
+            ->where('is_suspended', false); // Suspended olmayan kullanıcılar
+        
+        // Şehir filtresi
+        if ($request->filled('city')) {
+            $query->where('current_city', $request->city);
+        }
+        
+        // İlçe filtresi
+        if ($request->filled('district')) {
+            $query->where('current_district', $request->district);
+        }
+        
+        // Meslek filtresi
+        if ($request->filled('profession_id')) {
+            $query->where('profession_id', $request->profession_id);
+        }
+        
+        // Arama filtresi
+        if ($request->filled('search')) {
+            $searchTerm = $request->search;
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('name', 'like', '%' . $searchTerm . '%')
+                  ->orWhere('current_city', 'like', '%' . $searchTerm . '%')
+                  ->orWhere('current_district', 'like', '%' . $searchTerm . '%');
+            });
+        }
+        
+        // Pagination ile kullanıcıları getir
+        $users = $query->orderBy('created_at', 'desc')->paginate(16);
+        
+        $professions = Profession::where('is_active', true)->orderBy('name')->get();
+        $cities = config('turkiye.cities');
+        
+        return view('hemsehriler.index', compact('users', 'professions', 'cities'));
+    }
 }

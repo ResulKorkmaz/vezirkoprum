@@ -206,7 +206,7 @@
                 </p>
             </div>
 
-            <!-- Gerçek Üye Paylaşımları -->
+            <!-- Gerçek Üye Paylaşımları - 2 Satır, Her Satırda 3 Post -->
             @if($posts && $posts->count() > 0)
                 <!-- İlk Satır - İlk 3 Paylaşım -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -403,7 +403,7 @@
                 </div>
             </div>
 
-                <!-- İkinci Satır - Kalan 3 Paylaşım -->
+                <!-- İkinci Satır - 4., 5., 6. Paylaşım -->
                 @if($posts->count() > 3)
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         @foreach($posts->skip(3)->take(3) as $post)

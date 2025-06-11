@@ -18,13 +18,13 @@ class PostController extends Controller
     }
 
     /**
-     * Tüm paylaşımları listele (sadece temiz postlar)
+     * Tüm paylaşımları listele (temiz ve şüpheli postlar)
      */
     public function index()
     {
         $posts = Post::with('user')
             ->active()
-            ->clean() // Sadece temiz postları göster
+            ->whereIn('spam_status', ['clean', 'suspicious']) // Temiz ve şüpheli postları göster
             ->latest()
             ->paginate(12);
             

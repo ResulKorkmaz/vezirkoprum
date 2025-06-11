@@ -65,6 +65,7 @@ class HomeController extends Controller
         // En yeni 6 paylaşımı getir
         $posts = Post::with('user')
             ->active()
+            ->whereIn('spam_status', ['clean', 'suspicious']) // Temiz ve şüpheli postları göster
             ->latest()
             ->limit(6)
             ->get();

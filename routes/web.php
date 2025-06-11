@@ -129,6 +129,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::patch('/posts/{post}/approve', [\App\Http\Controllers\Admin\SpamController::class, 'approvePost'])->name('posts.approve');
         Route::patch('/posts/{post}/spam', [\App\Http\Controllers\Admin\SpamController::class, 'confirmSpam'])->name('posts.spam');
         Route::patch('/posts/{post}/quarantine', [\App\Http\Controllers\Admin\SpamController::class, 'quarantinePost'])->name('posts.quarantine');
+        Route::delete('/posts/{post}', [\App\Http\Controllers\Admin\SpamController::class, 'deletePost'])->name('posts.delete');
         Route::post('/posts/bulk', [\App\Http\Controllers\Admin\SpamController::class, 'bulkAction'])->name('posts.bulk');
         
         // Kelime işlemleri

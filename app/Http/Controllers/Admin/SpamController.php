@@ -86,8 +86,16 @@ class SpamController extends Controller
             ->paginate(50);
 
         $categories = SpamWord::distinct('category')->pluck('category');
+        
+        // Stats için kategori bazında sayıları hesapla
+        $categoryStats = [
+            'profanity' => SpamWord::where('category', 'profanity')->count(),
+            'scam' => SpamWord::where('category', 'scam')->count(),
+            'commercial' => SpamWord::where('category', 'commercial')->count(),
+            'inappropriate' => SpamWord::where('category', 'inappropriate')->count(),
+        ];
 
-        return view('admin.spam.words', compact('words', 'categories'));
+        return view('admin.spam.words', compact('words', 'categories', 'categoryStats'));
     }
 
     /**
@@ -126,6 +134,19 @@ class SpamController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Post karantinaya alındı.'
+        ]);
+    }
+
+    /**
+     * Postu sil (Admin yetkisi ile)
+     */
+    public function deletePost(Post $post)
+    {
+        $post->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Post başarıyla silindi.'
         ]);
     }
 

@@ -506,6 +506,25 @@
                     @endauth
                 </div>
             @endif
+            
+            <!-- Tüm Yorumlar Butonu -->
+            @if($posts && $posts->count() > 0)
+                <div class="text-center mt-12">
+                    <a href="{{ route('posts.index') }}" 
+                       class="inline-flex items-center px-8 py-4 text-white text-lg font-bold rounded-2xl shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300"
+                       style="background: linear-gradient(to right, #B76E79, #A85D68);"
+                       onmouseover="this.style.background='linear-gradient(to right, #A85D68, #9A5460)'"
+                       onmouseout="this.style.background='linear-gradient(to right, #B76E79, #A85D68)'">
+                        <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-3.582 8-8 8a9.863 9.863 0 01-4.906-1.289L3 21l1.289-5.094A9.863 9.863 0 013 12c0-4.418 3.582-8 8-8s8 3.582 8 8z"></path>
+                        </svg>
+                        Tüm Yorumları Gör
+                        <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                        </svg>
+                    </a>
+                </div>
+            @endif
         </div>
     </section>
 

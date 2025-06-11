@@ -94,7 +94,19 @@
 
                             <!-- Paylaşım İçeriği -->
                             <div class="text-gray-700 text-sm leading-relaxed mb-4 min-h-[60px]">
-                                {{ $post->short_content }}
+                                <p id="post-content-{{ $post->id }}">
+                                    {{ Str::limit($post->content, 120) }}
+                                </p>
+                                @if(strlen($post->content) > 120)
+                                    <button onclick="togglePostContent({{ $post->id }}, {{ json_encode($post->content) }})" 
+                                            id="post-toggle-{{ $post->id }}"
+                                            class="mt-2 text-sm font-semibold transition-colors duration-200 hover:underline" 
+                                            style="color: #B76E79;"
+                                            onmouseover="this.style.color='#A85D68'" 
+                                            onmouseout="this.style.color='#B76E79'">
+                                        Devamını Gör
+                                    </button>
+                                @endif
                             </div>
 
                             <!-- Alt Bilgiler -->
@@ -414,6 +426,27 @@
                 editTextarea.addEventListener('input', updateEditCharCount);
             }
         });
+
+        // Post içeriği genişletme/daraltma fonksiyonu
+        function togglePostContent(postId, fullContent) {
+            const contentElement = document.getElementById(`post-content-${postId}`);
+            const toggleButton = document.getElementById(`post-toggle-${postId}`);
+            
+            if (toggleButton.textContent === 'Devamını Gör') {
+                // Tam içeriği göster
+                contentElement.innerHTML = fullContent;
+                toggleButton.textContent = 'Daha Az Göster';
+                toggleButton.onmouseover = function() { this.style.color='#A85D68'; };
+                toggleButton.onmouseout = function() { this.style.color='#B76E79'; };
+            } else {
+                // Kısaltılmış içeriği göster
+                const limitedContent = fullContent.length > 120 ? fullContent.substring(0, 120) + '...' : fullContent;
+                contentElement.innerHTML = limitedContent;
+                toggleButton.textContent = 'Devamını Gör';
+                toggleButton.onmouseover = function() { this.style.color='#A85D68'; };
+                toggleButton.onmouseout = function() { this.style.color='#B76E79'; };
+            }
+        }
 
         // ESC ile modal kapatma
         document.addEventListener('keydown', function(event) {

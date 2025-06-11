@@ -91,7 +91,7 @@
                                    class="inline-flex items-center px-6 sm:px-8 py-3 sm:py-4 text-white text-base sm:text-lg font-bold rounded-2xl shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300" 
                                    style="background: linear-gradient(to right, #B76E79, #A85D68);" 
                                    onmouseover="this.style.background='linear-gradient(to right, #A85D68, #9A5460)'" 
-                                   onmouseout="this.style.background='linear-gradient(to right, #B76E79, #A85D68)'"
+                                   onmouseout="this.style.background='linear-gradient(to right, #B76E79, #A85D68)"
                                     <svg class="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                                     </svg>
@@ -472,142 +472,29 @@
                     </div>
                 @endif
             @else
-                <!-- Paylaşım yoksa varsayılan içerik -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <!-- Varsayılan paylaşım 1 -->
-                    <div class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100">
-                        <div class="flex items-center mb-4">
-                            <img class="w-12 h-12 rounded-full object-cover border-2 border-rose-200" 
-                                 src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQ4IiBoZWlnaHQ9IjQ4IiByeD0iMjQiIGZpbGw9IiNCNzZFNzkiLz4KPHN2ZyB4PSIxMiIgeT0iMTAiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIj4KPHBhdGggZD0iTTEyIDEyQzE0LjIwOTEgMTIgMTYgMTAuMjA5MSAxNiA4QzE2IDUuNzkwODYgMTQuMjA5MSA0IDEyIDRDOS43OTA4NiA0IDggNS43OTA4NiA4IDhDOCAxMC4yMDkxIDkuNzkwODYgMTIgMTIgMTJaIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNMTIgMTRDOC4xMzQwMSAxNCA1IDE3LjEzNDAxIDUgMjFIMTlDMTkgMTcuMTM0MDEgMTUuODY2IDE0IDEyIDE0WiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+Cjwvc3ZnPgo=" 
-                                 alt="Hemşehri">
-                            <div class="ml-3">
-                                <h4 class="font-bold text-gray-900">Vezirköprü Hemşehrimiz</h4>
-                                <p class="text-sm text-gray-500">Platform Üyesi</p>
-                            </div>
+                <!-- Paylaşım yoksa boş durum -->
+                <div class="text-center py-12">
+                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                    </svg>
+                    <h3 class="mt-4 text-lg font-medium text-gray-900">Henüz paylaşım yok</h3>
+                    <p class="mt-2 text-sm text-gray-500">İlk paylaşımı sen yap ve topluluğu canlandır!</p>
+                    @auth
+                        <div class="mt-6">
+                            <a href="{{ route('posts.create') }}" 
+                               class="inline-flex items-center px-6 py-3 text-white text-sm font-medium rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+                               style="background: linear-gradient(to right, #B76E79, #A85D68);"
+                               onmouseover="this.style.background='linear-gradient(to right, #A85D68, #9A5460)'"
+                               onmouseout="this.style.background='linear-gradient(to right, #B76E79, #A85D68)'">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                </svg>
+                                İlk Paylaşımı Yap
+                            </a>
                         </div>
-                        <div class="flex mb-3">
-                            <div class="flex space-x-1">
-                                @for($i = 1; $i <= 5; $i++)
-                                    <svg class="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
-                                        <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
-                                    </svg>
-                                @endfor
-                            </div>
-                        </div>
-                        <p class="text-gray-600 text-sm leading-relaxed">
-                            "Bu platform sayesinde yıllardır görmediğim lise arkadaşımla tekrar buluştum. Vezirköprülüler artık bir aile gibiyiz!"
-                        </p>
-                        <div class="mt-4 pt-4 border-t border-gray-100">
-                            <p class="text-xs text-gray-400">Vezirköprü Toplulugu</p>
-                        </div>
-                    </div>
-
-                <!-- Paylaşım 2 -->
-                <div class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100">
-                    <div class="flex items-center mb-4">
-                        <img class="w-12 h-12 rounded-full object-cover border-2 border-rose-200" 
-                             src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQ4IiBoZWlnaHQ9IjQ4IiByeD0iMjQiIGZpbGw9IiNCNzZFNzkiLz4KPHN2ZyB4PSIxMiIgeT0iMTAiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIj4KPHBhdGggZD0iTTEyIDEyQzE0LjIwOTEgMTIgMTYgMTAuMjA5MSAxNiA4QzE2IDUuNzkwODYgMTQuMjA5MSA0IDEyIDRDOS43OTA4NiA0IDggNS43OTA4NiA4IDhDOCAxMC4yMDkxIDkuNzkwODYgMTIgMTIgMTJaIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNMTIgMTRDOC4xMzQwMSAxNCA1IDE3LjEzNDAxIDUgMjFIMTlDMTkgMTcuMTM0MDEgMTUuODY2IDE0IDEyIDE0WiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+Cjwvc3ZnPgo=" 
-                             alt="Ayşe Hanım">
-                        <div class="ml-3">
-                            <h4 class="font-bold text-gray-900">Ayşe Demir</h4>
-                            <p class="text-sm text-gray-500">Öğretmen</p>
-                        </div>
-                    </div>
-                    <div class="flex mb-3">
-                        <div class="flex space-x-1">
-                            <svg class="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
-                                <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
-                            </svg>
-                            <svg class="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
-                                <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
-                            </svg>
-                            <svg class="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
-                                <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
-                            </svg>
-                            <svg class="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
-                                <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
-                            </svg>
-                            <svg class="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
-                                <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
-                            </svg>
-                        </div>
-                    </div>
-                    <p class="text-gray-600 text-sm leading-relaxed">
-                        "Ankara'ya taşındıktan sonra kendimi yalnız hissediyordum. Bu site sayesinde buradaki hemşehrilerimle tanıştım. Harika bir topluluk!"
-                    </p>
-                    <div class="mt-4 pt-4 border-t border-gray-100">
-                        <p class="text-xs text-gray-400">Ankara, Çankaya</p>
-                    </div>
+                    @endauth
                 </div>
-
-                <!-- Paylaşım 3 -->
-                <div class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100">
-                    <div class="flex items-center mb-4">
-                        <img class="w-12 h-12 rounded-full object-cover border-2 border-rose-200" 
-                             src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQ4IiBoZWlnaHQ9IjQ4IiByeD0iMjQiIGZpbGw9IiNCNzZFNzkiLz4KPHN2ZyB4PSIxMiIgeT0iMTAiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIj4KPHBhdGggZD0iTTEyIDEyQzE0LjIwOTEgMTIgMTYgMTAuMjA5MSAxNiA4QzE2IDUuNzkwODYgMTQuMjA5MSA0IDEyIDRDOS43OTA4NiA0IDggNS43OTA4NiA4IDhDOCAxMC4yMDkxIDkuNzkwODYgMTIgMTIgMTJaIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNMTIgMTRDOC4xMzQwMSAxNCA1IDE3LjEzNDAxIDUgMjFIMTlDMTkgMTcuMTM0MDEgMTUuODY2IDE0IDEyIDE0WiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+Cjwvc3ZnPgo=" 
-                             alt="Ali Bey">
-                        <div class="ml-3">
-                            <h4 class="font-bold text-gray-900">Ali Kaya</h4>
-                            <p class="text-sm text-gray-500">Doktor</p>
-                        </div>
-                    </div>
-                    <div class="flex mb-3">
-                        <div class="flex space-x-1">
-                            <svg class="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
-                                <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
-                            </svg>
-                            <svg class="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
-                                <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
-                            </svg>
-                            <svg class="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
-                                <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
-                            </svg>
-                            <svg class="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
-                                <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
-                            </svg>
-                            <svg class="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
-                                <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
-                            </svg>
-                        </div>
-                    </div>
-                    <p class="text-gray-600 text-sm leading-relaxed">
-                        "İzmir'de doktorluk yapıyorum. Bu platform sayesinde buradaki hemşehrilerimle buluştuk. Artık düzenli toplantılar düzenliyoruz!"
-                    </p>
-                    <div class="mt-4 pt-4 border-t border-gray-100">
-                        <p class="text-xs text-gray-400">İzmir, Konak</p>
-                    </div>
-                </div>
-            </div>
-
-
-                 
-                 <!-- Tüm Paylaşımları Gör Butonu -->
-                 @if($posts && $posts->count() > 0)
-                     <div class="text-center mt-12">
-                         <a href="{{ route('posts.index') }}" 
-                            class="inline-flex items-center px-8 py-4 text-white text-lg font-bold rounded-2xl shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300" 
-                            style="background: linear-gradient(to right, #B76E79, #A85D68);" 
-                            onmouseover="this.style.background='linear-gradient(to right, #A85D68, #9A5460)'" 
-                            onmouseout="this.style.background='linear-gradient(to right, #B76E79, #A85D68)'">
-                             <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
-                             </svg>
-                             Tüm Paylaşımları Gör
-                         </a>
-                         @auth
-                             <div class="mt-4">
-                                 <a href="{{ route('posts.create') }}" 
-                                    class="inline-flex items-center px-6 py-3 text-gray-700 text-base font-semibold rounded-xl border-2 border-gray-300 hover:border-gray-400 bg-white hover:bg-gray-50 transition-all duration-300">
-                                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                                     </svg>
-                                     Sen de Paylaş
-                                 </a>
-                             </div>
-                         @endauth
-                     </div>
-                 @endif
-             @endif
+            @endif
         </div>
     </section>
 

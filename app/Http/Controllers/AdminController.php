@@ -83,16 +83,17 @@ class AdminController extends Controller
 
         // Bildiri istatistikleri
         $reportStats = [
-            'pending_reports' => Report::where('status', 'pending')->count(),
+            'pending_reports' => Report::where('status', 'pending')->whereNull('viewed_at')->count(),
             'total_reports' => Report::count(),
             'recent_reports' => Report::where('created_at', '>=', now()->subDays(7))->count(),
         ];
 
         $recentUsers = User::where('is_admin', false)->latest()->limit(10)->get();
         
-        // Bekleyen bildiriler (en son 5 tane)
+        // Bekleyen bildiriler (en son 5 tane) - henüz detayına bakılmayanlar
         $pendingReports = Report::with(['reporter', 'reportable'])
             ->where('status', 'pending')
+            ->whereNull('viewed_at')
             ->latest()
             ->limit(5)
             ->get();

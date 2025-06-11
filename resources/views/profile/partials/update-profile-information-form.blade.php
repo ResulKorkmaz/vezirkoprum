@@ -210,7 +210,7 @@ document.getElementById('profile_photo').addEventListener('change', function(e) 
     if (file) {
         // Dosya boyutu kontrolü (10MB)
         if (file.size > 10 * 1024 * 1024) {
-            alert('Dosya boyutu 10MB\'dan büyük olamaz.');
+                            showModernToast('📁 Dosya boyutu 10MB\'dan büyük olamaz.', 'error');
             e.target.value = '';
             previewContainer.classList.add('hidden');
             return;
@@ -218,7 +218,7 @@ document.getElementById('profile_photo').addEventListener('change', function(e) 
         
         // Dosya tipi kontrolü
         if (!file.type.startsWith('image/')) {
-            alert('Lütfen bir resim dosyası seçin.');
+                            showModernToast('🖼️ Lütfen bir resim dosyası seçin.', 'error');
             e.target.value = '';
             previewContainer.classList.add('hidden');
             return;

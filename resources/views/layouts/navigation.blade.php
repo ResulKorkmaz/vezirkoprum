@@ -29,22 +29,90 @@
                 </a>
 
                 @auth
-                    <!-- Mesajlar -->
-                    <a href="{{ route('messages.index') }}" 
-                       class="px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 relative {{ request()->routeIs('messages.*') ? 'shadow-sm' : 'text-gray-700 hover:bg-gray-50' }}"
-                       style="{{ request()->routeIs('messages.*') ? 'background-color: rgba(183, 110, 121, 0.1); color: #B76E79;' : '' }}"
-                       onmouseover="if (!this.classList.contains('shadow-sm')) { this.style.color='#B76E79'; }"
-                       onmouseout="if (!this.classList.contains('shadow-sm')) { this.style.color='#374151'; }">
-                        <svg class="w-4 h-4 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                        </svg>
-                        Mesajlar
-                            @if(auth()->user()->unread_messages_count > 0)
-                            <span class="absolute -top-1 -right-1 bg-emerald-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
-                                    {{ auth()->user()->unread_messages_count }}
+                    <!-- Bildirimler (Dropdown) -->
+                    <div class="relative" x-data="{ notificationsOpen: false }">
+                        <button @mouseenter="notificationsOpen = true" @mouseleave="notificationsOpen = false"
+                                class="relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 {{ request()->routeIs('notifications.*') || request()->routeIs('messages.*') ? 'shadow-sm' : 'text-gray-700 hover:bg-gray-50' }}"
+                                style="{{ request()->routeIs('notifications.*') || request()->routeIs('messages.*') ? 'background-color: rgba(183, 110, 121, 0.1); color: #B76E79;' : '' }}"
+                                onmouseover="if (!this.classList.contains('shadow-sm')) { this.style.color='#B76E79'; }"
+                                onmouseout="if (!this.classList.contains('shadow-sm')) { this.style.color='#374151'; }">
+                            <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM12 2c3.31 0 6 2.69 6 6v3l2 3H4l2-3V8c0-3.31 2.69-6 6-6z"></path>
+                            </svg>
+                            Bildirimler
+                            @php
+                                $totalNotifications = auth()->user()->unread_notifications_count + auth()->user()->unread_messages_count;
+                            @endphp
+                            @if($totalNotifications > 0)
+                                <span class="absolute -top-1 -right-1 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 rounded-full shadow-lg" style="background: linear-gradient(to right, #dc2626, #b91c1c); min-width: 20px; height: 20px;">
+                                    {{ $totalNotifications > 99 ? '99+' : $totalNotifications }}
                                 </span>
                             @endif
-                        </a>
+                        </button>
+
+                        <!-- Dropdown Menu -->
+                        <div x-show="notificationsOpen" 
+                             @mouseenter="notificationsOpen = true" @mouseleave="notificationsOpen = false"
+                             x-transition:enter="transition ease-out duration-200"
+                             x-transition:enter-start="opacity-0 scale-95"
+                             x-transition:enter-end="opacity-1 scale-100"
+                             x-transition:leave="transition ease-in duration-150"
+                             x-transition:leave-start="opacity-1 scale-100"
+                             x-transition:leave-end="opacity-0 scale-95"
+                             class="absolute left-0 mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50">
+                            
+                            <!-- Tüm Bildirimler -->
+                            <a href="{{ route('notifications.index') }}" 
+                               class="flex items-center justify-between px-4 py-3 text-sm transition-colors duration-200 {{ request()->routeIs('notifications.*') ? 'bg-rose-50 text-rose-600' : 'text-gray-700 hover:bg-gray-50' }}"
+                               onmouseover="if (!'{{ request()->routeIs('notifications.*') }}') { this.style.backgroundColor='rgba(183, 110, 121, 0.1)'; this.style.color='#B76E79'; }"
+                               onmouseout="if (!'{{ request()->routeIs('notifications.*') }}') { this.style.backgroundColor='transparent'; this.style.color='#374151'; }">
+                                <div class="flex items-center">
+                                    <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM12 2c3.31 0 6 2.69 6 6v3l2 3H4l2-3V8c0-3.31 2.69-6 6-6z"></path>
+                                    </svg>
+                                    Tüm Bildirimler
+                                </div>
+                                @if(auth()->user()->unread_notifications_count > 0)
+                                    <span class="bg-red-500 text-white text-xs rounded-full px-2 py-1 min-w-[20px] text-center">
+                                        {{ auth()->user()->unread_notifications_count > 99 ? '99+' : auth()->user()->unread_notifications_count }}
+                                    </span>
+                                @endif
+                            </a>
+
+                            <!-- Mesajlar -->
+                            <a href="{{ route('messages.index') }}" 
+                               class="flex items-center justify-between px-4 py-3 text-sm transition-colors duration-200 {{ request()->routeIs('messages.*') ? 'bg-rose-50 text-rose-600' : 'text-gray-700 hover:bg-gray-50' }}"
+                               onmouseover="if (!'{{ request()->routeIs('messages.*') }}') { this.style.backgroundColor='rgba(183, 110, 121, 0.1)'; this.style.color='#B76E79'; }"
+                               onmouseout="if (!'{{ request()->routeIs('messages.*') }}') { this.style.backgroundColor='transparent'; this.style.color='#374151'; }">
+                                <div class="flex items-center">
+                                    <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+                                    </svg>
+                                    Mesajlar
+                                </div>
+                                @if(auth()->user()->unread_messages_count > 0)
+                                    <span class="bg-red-500 text-white text-xs rounded-full px-2 py-1 min-w-[20px] text-center">
+                                        {{ auth()->user()->unread_messages_count > 99 ? '99+' : auth()->user()->unread_messages_count }}
+                                    </span>
+                                @endif
+                            </a>
+
+                            <!-- Ayırıcı -->
+                            <hr class="my-2 border-gray-100">
+                            
+                            <!-- Ayarlar -->
+                            <a href="{{ route('notifications.settings') }}" 
+                               class="flex items-center px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 transition-colors duration-200"
+                               onmouseover="this.style.backgroundColor='rgba(183, 110, 121, 0.1)'; this.style.color='#B76E79';"
+                               onmouseout="this.style.backgroundColor='transparent'; this.style.color='#6B7280';">
+                                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                </svg>
+                                Bildirim Ayarları
+                            </a>
+                        </div>
+                    </div>
 
                     <!-- WhatsApp Grupları -->
                     <a href="{{ route('whatsapp.index') }}" 
@@ -229,22 +297,79 @@
                 </a>
 
                 @auth
-                    <!-- Mesajlar -->
-                    <a href="{{ route('messages.index') }}" 
-                       class="block px-3 py-2 rounded-lg text-base font-medium {{ request()->routeIs('messages.*') ? '' : 'text-gray-700 hover:bg-gray-50' }} transition-colors duration-200 relative"
-                       style="{{ request()->routeIs('messages.*') ? 'background-color: rgba(183, 110, 121, 0.1); color: #B76E79;' : '' }}"
-                       onmouseover="if (!'{{ request()->routeIs('messages.*') }}') { this.style.color='#B76E79'; }"
-                       onmouseout="if (!'{{ request()->routeIs('messages.*') }}') { this.style.color='#374151'; }">
-                        <svg class="w-5 h-5 inline-block mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                        </svg>
-                        Mesajlar
-                        @if(auth()->user()->unread_messages_count > 0)
-                            <span class="absolute top-2 right-3 bg-emerald-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                                {{ auth()->user()->unread_messages_count }}
-                            </span>
-                        @endif
-                    </a>
+                    <!-- Bildirimler (Dropdown) -->
+                    <div x-data="{ mobileNotificationsOpen: false }">
+                        <button @click="mobileNotificationsOpen = !mobileNotificationsOpen"
+                                class="flex items-center justify-between w-full px-3 py-2 rounded-lg text-base font-medium {{ request()->routeIs('notifications.*') || request()->routeIs('messages.*') ? '' : 'text-gray-700 hover:bg-gray-50' }} transition-colors duration-200"
+                                style="{{ request()->routeIs('notifications.*') || request()->routeIs('messages.*') ? 'background-color: rgba(183, 110, 121, 0.1); color: #B76E79;' : '' }}"
+                                onmouseover="if (!'{{ request()->routeIs('notifications.*') || request()->routeIs('messages.*') }}') { this.style.color='#B76E79'; }"
+                                onmouseout="if (!'{{ request()->routeIs('notifications.*') || request()->routeIs('messages.*') }}') { this.style.color='#374151'; }">
+                            <div class="flex items-center">
+                                <svg class="w-5 h-5 inline-block mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM12 2c3.31 0 6 2.69 6 6v3l2 3H4l2-3V8c0-3.31 2.69-6 6-6z"></path>
+                                </svg>
+                                <span>Bildirimler</span>
+                                @php
+                                    $mobileTotalNotifications = auth()->user()->unread_notifications_count + auth()->user()->unread_messages_count;
+                                @endphp
+                                @if($mobileTotalNotifications > 0)
+                                    <span class="ml-2 bg-red-500 text-white text-xs rounded-full px-2 py-1 min-w-[20px] text-center">
+                                        {{ $mobileTotalNotifications > 99 ? '99+' : $mobileTotalNotifications }}
+                                    </span>
+                                @endif
+                            </div>
+                            <svg class="w-4 h-4 transition-transform duration-200" :class="{ 'rotate-180': mobileNotificationsOpen }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+
+                        <!-- Mobile Dropdown Content -->
+                        <div x-show="mobileNotificationsOpen" 
+                             x-transition:enter="transition ease-out duration-200"
+                             x-transition:enter-start="opacity-0 -translate-y-2"
+                             x-transition:enter-end="opacity-1 translate-y-0"
+                             x-transition:leave="transition ease-in duration-150"
+                             x-transition:leave-start="opacity-1 translate-y-0"
+                             x-transition:leave-end="opacity-0 -translate-y-2"
+                             class="ml-6 mt-2 space-y-1">
+                            
+                            <!-- Tüm Bildirimler -->
+                            <a href="{{ route('notifications.index') }}" 
+                               class="flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs('notifications.*') ? 'bg-rose-50 text-rose-600' : 'text-gray-600 hover:bg-gray-50' }} transition-colors duration-200"
+                               onmouseover="if (!'{{ request()->routeIs('notifications.*') }}') { this.style.color='#B76E79'; }"
+                               onmouseout="if (!'{{ request()->routeIs('notifications.*') }}') { this.style.color='#6B7280'; }">
+                                <div class="flex items-center">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM12 2c3.31 0 6 2.69 6 6v3l2 3H4l2-3V8c0-3.31 2.69-6 6-6z"></path>
+                                    </svg>
+                                    Tüm Bildirimler
+                                </div>
+                                @if(auth()->user()->unread_notifications_count > 0)
+                                    <span class="bg-red-500 text-white text-xs rounded-full px-2 py-1 min-w-[18px] text-center">
+                                        {{ auth()->user()->unread_notifications_count > 99 ? '99+' : auth()->user()->unread_notifications_count }}
+                                    </span>
+                                @endif
+                            </a>
+
+                            <!-- Mesajlar -->
+                            <a href="{{ route('messages.index') }}" 
+                               class="flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs('messages.*') ? 'bg-rose-50 text-rose-600' : 'text-gray-600 hover:bg-gray-50' }} transition-colors duration-200"
+                               onmouseover="if (!'{{ request()->routeIs('messages.*') }}') { this.style.color='#B76E79'; }"
+                               onmouseout="if (!'{{ request()->routeIs('messages.*') }}') { this.style.color='#6B7280'; }">
+                                <div class="flex items-center">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+                                    </svg>
+                                    Mesajlar
+                                </div>
+                                @if(auth()->user()->unread_messages_count > 0)
+                                    <span class="bg-red-500 text-white text-xs rounded-full px-2 py-1 min-w-[18px] text-center">
+                                        {{ auth()->user()->unread_messages_count > 99 ? '99+' : auth()->user()->unread_messages_count }}
+                                    </span>
+                                @endif
+                            </a>
+                        </div>
+                    </div>
 
                     <!-- WhatsApp Grupları -->
                     <a href="{{ route('whatsapp.index') }}" 

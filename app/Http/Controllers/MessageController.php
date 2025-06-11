@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Message;
 use App\Models\User;
+use App\Models\Notification;
 use App\Http\Requests\MessageSendRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
@@ -41,6 +42,15 @@ class MessageController extends Controller
         $data = $request->validated();
         $data['sender_id'] = Auth::id();
         $message = Message::create($data);
+        
+        // Mesaj bildirimi gönder
+        try {
+            \App\Models\Notification::createMessageNotification($message);
+        } catch (\Exception $e) {
+            \Log::error('Message notification failed: ' . $e->getMessage());
+            // Bildirim hatası ana işlemi etkilemesin
+        }
+        
         return redirect()->route('messages.show', $message->id)->with('success', 'Mesaj gönderildi.');
     }
 

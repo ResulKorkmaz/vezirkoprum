@@ -21,10 +21,12 @@ class Report extends Model
         'reviewed_by',
         'admin_notes',
         'reviewed_at',
+        'viewed_at',
     ];
 
     protected $casts = [
         'reviewed_at' => 'datetime',
+        'viewed_at' => 'datetime',
     ];
 
     /**

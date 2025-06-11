@@ -7,6 +7,7 @@ use App\Http\Controllers\PostController;
 use App\Http\Controllers\WhatsappController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\Admin\SiteSettingsController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 
@@ -45,6 +46,9 @@ Route::middleware('guest')->prefix('admin')->name('admin.')->group(function () {
     Route::post('/login', [AdminController::class, 'login']);
 });
 
+// Yorum okuma - herkese açık
+Route::get('/posts/{post}/comments', [\App\Http\Controllers\CommentController::class, 'index'])->name('posts.comments.index');
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -59,6 +63,20 @@ Route::middleware('auth')->group(function () {
         Route::get('/{post}/edit', [PostController::class, 'edit'])->name('edit');
         Route::put('/{post}', [PostController::class, 'update'])->name('update');
         Route::delete('/{post}', [PostController::class, 'destroy'])->name('destroy');
+        
+        // Beğeni işlemleri
+        Route::post('/{post}/like', [\App\Http\Controllers\LikeController::class, 'toggle'])->name('like');
+        Route::get('/{post}/like-status', [\App\Http\Controllers\LikeController::class, 'status'])->name('like.status');
+        Route::get('/{post}/likers', [\App\Http\Controllers\LikeController::class, 'users'])->name('likers');
+        
+        // Yorum yazma - sadece giriş yapmış kullanıcılar
+        Route::post('/{post}/comments', [\App\Http\Controllers\CommentController::class, 'store'])->name('comments.store');
+    });
+    
+    // Yorum yönetimi
+    Route::prefix('comments')->name('comments.')->group(function () {
+        Route::put('/{comment}', [\App\Http\Controllers\CommentController::class, 'update'])->name('update');
+        Route::delete('/{comment}', [\App\Http\Controllers\CommentController::class, 'destroy'])->name('destroy');
     });
     
     // Mesajlaşma
@@ -77,6 +95,20 @@ Route::middleware('auth')->group(function () {
         Route::post('/', [\App\Http\Controllers\ReportController::class, 'store'])->name('store');
     });
     
+    // Bildirimler (Notifications)
+    Route::prefix('notifications')->name('notifications.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\NotificationController::class, 'index'])->name('index');
+        Route::get('/api', [\App\Http\Controllers\NotificationController::class, 'getNotifications'])->name('api');
+        Route::get('/count', [\App\Http\Controllers\NotificationController::class, 'getUnreadCount'])->name('count');
+        Route::patch('/{notification}/read', [\App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('mark-read');
+        Route::patch('/{notification}/unread', [\App\Http\Controllers\NotificationController::class, 'markAsUnread'])->name('mark-unread');
+        Route::patch('/mark-all-read', [\App\Http\Controllers\NotificationController::class, 'markAllAsRead'])->name('mark-all-read');
+        Route::delete('/{notification}', [\App\Http\Controllers\NotificationController::class, 'destroy'])->name('destroy');
+        Route::get('/{notification}/redirect', [\App\Http\Controllers\NotificationController::class, 'readAndRedirect'])->name('redirect');
+        Route::get('/settings', [\App\Http\Controllers\NotificationController::class, 'settings'])->name('settings');
+        Route::patch('/settings', [\App\Http\Controllers\NotificationController::class, 'updateSettings'])->name('update-settings');
+    });
+    
     // WhatsApp grupları - sadece görüntüleme
     Route::get('/whatsapp', [WhatsappController::class, 'index'])->name('whatsapp.index');
 });
@@ -86,6 +118,28 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
     Route::post('/logout', [AdminController::class, 'logout'])->name('logout');
     Route::resource('whatsapp', WhatsappController::class);
+    
+    // Spam yönetimi
+    Route::prefix('spam')->name('spam.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\SpamController::class, 'index'])->name('index');
+        Route::get('/posts', [\App\Http\Controllers\Admin\SpamController::class, 'posts'])->name('posts');
+        Route::get('/words', [\App\Http\Controllers\Admin\SpamController::class, 'words'])->name('words');
+        
+        // Post işlemleri
+        Route::patch('/posts/{post}/approve', [\App\Http\Controllers\Admin\SpamController::class, 'approvePost'])->name('posts.approve');
+        Route::patch('/posts/{post}/spam', [\App\Http\Controllers\Admin\SpamController::class, 'confirmSpam'])->name('posts.spam');
+        Route::patch('/posts/{post}/quarantine', [\App\Http\Controllers\Admin\SpamController::class, 'quarantinePost'])->name('posts.quarantine');
+        Route::post('/posts/bulk', [\App\Http\Controllers\Admin\SpamController::class, 'bulkAction'])->name('posts.bulk');
+        
+        // Kelime işlemleri
+        Route::post('/words', [\App\Http\Controllers\Admin\SpamController::class, 'addWord'])->name('words.add');
+        Route::patch('/words/{word}', [\App\Http\Controllers\Admin\SpamController::class, 'updateWord'])->name('words.update');
+        Route::delete('/words/{word}', [\App\Http\Controllers\Admin\SpamController::class, 'deleteWord'])->name('words.delete');
+        
+        // Analiz işlemleri
+        Route::post('/analyze', [\App\Http\Controllers\Admin\SpamController::class, 'analyzeContent'])->name('analyze');
+        Route::post('/reanalyze', [\App\Http\Controllers\Admin\SpamController::class, 'reanalyzeAll'])->name('reanalyze');
+    });
     
     // Bildiri yönetimi
     Route::prefix('reports')->name('reports.')->group(function () {
@@ -131,6 +185,15 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         // Kullanıcı silme
         Route::get('/{user}/delete', [\App\Http\Controllers\Admin\UserManagementController::class, 'showDeleteForm'])->name('delete');
         Route::delete('/{user}', [\App\Http\Controllers\Admin\UserManagementController::class, 'destroy'])->name('destroy');
+    });
+    
+    // Site Ayarları
+    Route::prefix('settings')->name('settings.')->group(function () {
+        Route::get('/', [SiteSettingsController::class, 'index'])->name('index');
+        Route::put('/', [SiteSettingsController::class, 'update'])->name('update');
+        Route::post('/initialize', [SiteSettingsController::class, 'initializeDefaults'])->name('initialize');
+        Route::post('/', [SiteSettingsController::class, 'store'])->name('store');
+        Route::delete('/{setting}', [SiteSettingsController::class, 'destroy'])->name('destroy');
     });
 });
 

@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-admin-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
             Yeni WhatsApp Grubu Ekle
@@ -160,4 +160,4 @@
         // Sayfa yüklendiğinde çalıştır
         document.addEventListener('DOMContentLoaded', updateDistricts);
     </script>
-</x-app-layout> 
+</x-admin-layout> 

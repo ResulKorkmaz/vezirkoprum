@@ -187,7 +187,7 @@
                 
                 if (data.success) {
                     // Büyük başarı mesajı göster
-                    alert('🎉 Paylaşımınız başarıyla gönderildi!\n\nHemşehrilerimiz paylaşımınızı görebilir.');
+                    showModernToast('🎉 Paylaşımınız başarıyla gönderildi! Hemşehrilerimiz paylaşımınızı görebilir.', 'success', 6000);
                     
                     // Başarı kutucuğu da göster
                     successMessage.classList.remove('hidden');
@@ -206,19 +206,19 @@
                     
                     // Eğer limit dolmuşsa sayfayı yönlendir
                     if (data.remaining_posts <= 0) {
-                        alert('Günlük paylaşım limitiniz doldu. Yarın tekrar paylaşım yapabilirsiniz.');
+                        showModernToast('⏰ Günlük paylaşım limitiniz doldu. Yarın tekrar paylaşım yapabilirsiniz.', 'warning', 5000);
                         setTimeout(() => {
                             window.location.href = '{{ route("posts.index") }}';
                         }, 2000);
                     }
                     
                 } else {
-                    alert('❌ ' + (data.message || 'Bir hata oluştu. Lütfen tekrar deneyin.'));
+                    showModernToast(data.message || 'Bir hata oluştu. Lütfen tekrar deneyin.', 'error');
                 }
                 
             } catch (error) {
                 console.error('Error:', error);
-                alert('❌ Bir hata oluştu. Lütfen internet bağlantınızı kontrol edip tekrar deneyin.');
+                showModernToast('Bir hata oluştu. Lütfen internet bağlantınızı kontrol edip tekrar deneyin.', 'error');
             } finally {
                 submitBtn.disabled = contentTextarea.value.length < 10;
                 submitText.textContent = 'Paylaşımı Yayınla';

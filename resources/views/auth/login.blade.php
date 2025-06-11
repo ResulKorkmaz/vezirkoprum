@@ -102,7 +102,7 @@
                 this.submit();
             } catch (error) {
                 console.error('reCAPTCHA error:', error);
-                alert('Güvenlik doğrulaması başarısız. Lütfen tekrar deneyin.');
+                showModernToast('🔒 Güvenlik doğrulaması başarısız. Lütfen tekrar deneyin.', 'error');
                 
                 // Buton durumunu eski haline getir
                 submitBtn.disabled = false;

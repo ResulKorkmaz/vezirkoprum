@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-admin-layout>
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <h1 class="text-3xl font-bold mb-8">Kullanıcı Detayları: {{ $user->name }}</h1>
@@ -63,4 +63,4 @@
             </div>
         </div>
     </div>
-</x-app-layout> 
+</x-admin-layout> 

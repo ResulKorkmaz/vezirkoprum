@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-admin-layout>
     <div class="py-12">
         <div class="max-w-2xl mx-auto sm:px-6 lg:px-8">
             <h1 class="text-3xl font-bold mb-8 text-orange-600">Kullanıcıyı Askıya Al</h1>
@@ -103,4 +103,4 @@
             });
         });
     </script>
-</x-app-layout> 
+</x-admin-layout> 

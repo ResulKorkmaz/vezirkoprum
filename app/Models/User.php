@@ -120,6 +120,46 @@ class User extends Authenticatable
     }
 
     /**
+     * Kullanıcının beğenileri
+     */
+    public function likes()
+    {
+        return $this->hasMany(Like::class);
+    }
+
+    /**
+     * Kullanıcının yorumları
+     */
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
+
+    /**
+     * Kullanıcının bildirimleri
+     */
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class);
+    }
+
+    /**
+     * Kullanıcının gönderdiği bildiriler
+     */
+    public function sentNotifications()
+    {
+        return $this->hasMany(Notification::class, 'from_user_id');
+    }
+
+    /**
+     * Okunmamış bildirim sayısı
+     */
+    public function getUnreadNotificationsCountAttribute()
+    {
+        return $this->notifications()->unread()->count();
+    }
+
+    /**
      * Telefon şifreleme/deşifreleme
      */
     public function setPhoneAttribute($value)

@@ -4,18 +4,27 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use App\Rules\RecaptchaRule;
+use App\Services\SpamDetectionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class PostController extends Controller
 {
+    protected $spamDetection;
+
+    public function __construct(SpamDetectionService $spamDetection)
+    {
+        $this->spamDetection = $spamDetection;
+    }
+
     /**
-     * Tüm paylaşımları listele
+     * Tüm paylaşımları listele (sadece temiz postlar)
      */
     public function index()
     {
         $posts = Post::with('user')
             ->active()
+            ->clean() // Sadece temiz postları göster
             ->latest()
             ->paginate(12);
             
@@ -65,17 +74,42 @@ class PostController extends Controller
             'is_active' => true,
         ]);
 
+        // Spam analizi yap (middleware'den gelebilir veya burada)
+        if ($request->has('spam_analysis')) {
+            $analysis = $request->input('spam_analysis');
+        } else {
+            $analysis = $this->spamDetection->analyzeContent($request->content, $user->id);
+        }
+
+        // Spam skoruna göre postu işle
+        if ($analysis['score'] >= SpamDetectionService::QUARANTINE_THRESHOLD) {
+            $post->quarantine($analysis['reasons']);
+            $message = 'Paylaşımınız inceleme için karantinaya alındı. Moderasyon sonrası yayınlanacaktır.';
+        } elseif ($analysis['score'] >= SpamDetectionService::SPAM_THRESHOLD) {
+            $post->markAsSpam($analysis['reasons']);
+            $message = 'Paylaşımınız spam olarak işaretlendi ve yayınlanmadı. Lütfen içeriği gözden geçirin.';
+        } elseif ($analysis['score'] >= SpamDetectionService::SUSPICIOUS_THRESHOLD) {
+            $post->markAsSuspicious($analysis['score'], $analysis['reasons']);
+            $message = 'Paylaşımınız oluşturuldu ancak şüpheli içerik nedeniyle inceleme bekliyor.';
+        } else {
+            $post->markAsClean();
+            $message = 'Paylaşımınız başarıyla oluşturuldu!';
+        }
+
         $remainingPosts = Post::getUserRemainingPosts($user->id);
 
         return response()->json([
             'success' => true,
-            'message' => 'Paylaşımınız başarıyla oluşturuldu!',
+            'message' => $message,
             'remaining_posts' => $remainingPosts,
+            'spam_score' => $analysis['score'],
+            'spam_status' => $analysis['status'],
             'post' => [
                 'id' => $post->id,
                 'content' => $post->short_content,
                 'created_at' => $post->created_at->diffForHumans(),
                 'user_name' => $user->getDisplayNameWithIdForUser(auth()->user()),
+                'spam_status' => $post->spam_status,
             ]
         ]);
     }
@@ -140,18 +174,35 @@ class PostController extends Controller
             'content.max' => 'Paylaşım en fazla 500 karakter olabilir.',
         ]);
 
+        // Güncellenen içeriği spam için kontrol et
+        $analysis = $this->spamDetection->analyzeContent($request->content, $post->user_id);
+        
         // Paylaşımı güncelle
         $post->update([
             'content' => $request->content,
         ]);
 
+        // Spam analizi sonucuna göre işle
+        if ($analysis['score'] >= SpamDetectionService::SPAM_THRESHOLD) {
+            $post->markAsSpam($analysis['reasons']);
+            $message = 'Paylaşımınız güncellendi ancak spam içerik nedeniyle deaktif edildi.';
+        } elseif ($analysis['score'] >= SpamDetectionService::SUSPICIOUS_THRESHOLD) {
+            $post->markAsSuspicious($analysis['score'], $analysis['reasons']);
+            $message = 'Paylaşımınız güncellendi ancak şüpheli içerik nedeniyle inceleme bekliyor.';
+        } else {
+            $post->markAsClean();
+            $message = 'Paylaşımınız başarıyla güncellendi!';
+        }
+
         return response()->json([
             'success' => true,
-            'message' => 'Paylaşımınız başarıyla güncellendi!',
+            'message' => $message,
+            'spam_score' => $analysis['score'],
             'post' => [
                 'id' => $post->id,
                 'content' => $post->short_content,
                 'full_content' => $post->content,
+                'spam_status' => $post->spam_status,
             ]
         ]);
     }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Report;
 use App\Models\Post;
 use App\Models\Message;
+use App\Models\Comment;
 use App\Rules\RecaptchaRule;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -22,7 +23,7 @@ class ReportController extends Controller
         
         try {
             $request->validate([
-                'type' => ['required', 'string', 'in:post,message,user'],
+                'type' => ['required', 'string', 'in:post,message,user,comment'],
                 'item_id' => ['required', 'integer'],
                 'reason' => ['required', 'string', 'in:' . implode(',', array_keys(Report::getReasons()))],
                 'description' => ['nullable', 'string', 'max:500'],
@@ -48,6 +49,7 @@ class ReportController extends Controller
             'post' => 'App\\Models\\Post',
             'message' => 'App\\Models\\Message',
             'user' => 'App\\Models\\User',
+            'comment' => 'App\\Models\\Comment',
             default => null,
         };
 
@@ -112,7 +114,7 @@ class ReportController extends Controller
     public function create(Request $request): JsonResponse
     {
         $request->validate([
-            'type' => ['required', 'string', 'in:post,message,user'],
+            'type' => ['required', 'string', 'in:post,message,user,comment'],
             'id' => ['required', 'integer'],
         ]);
 
@@ -124,6 +126,7 @@ class ReportController extends Controller
             'post' => Post::find($id),
             'message' => Message::find($id),
             'user' => \App\Models\User::find($id),
+            'comment' => \App\Models\Comment::find($id),
             default => null,
         };
 
@@ -150,6 +153,33 @@ class ReportController extends Controller
 
         $reasons = Report::getReasons();
 
+        // İçerik bilgilerini ekle
+        $contentInfo = null;
+        if ($type === 'comment' && $model) {
+            $contentInfo = [
+                'content' => $model->content,
+                'user_name' => $model->user->name ?? 'Bilinmeyen Kullanıcı',
+                'created_at' => $model->created_at->diffForHumans(),
+            ];
+        } elseif ($type === 'post' && $model) {
+            $contentInfo = [
+                'content' => \Str::limit($model->content, 100),
+                'user_name' => $model->user->name ?? 'Bilinmeyen Kullanıcı',
+                'created_at' => $model->created_at->diffForHumans(),
+            ];
+        } elseif ($type === 'message' && $model) {
+            $contentInfo = [
+                'content' => \Str::limit($model->content, 100),
+                'user_name' => $model->user->name ?? 'Bilinmeyen Kullanıcı',
+                'created_at' => $model->created_at->diffForHumans(),
+            ];
+        } elseif ($type === 'user' && $model) {
+            $contentInfo = [
+                'name' => $model->name,
+                'email' => $model->email,
+            ];
+        }
+
         return response()->json([
             'success' => true,
             'data' => [
@@ -157,6 +187,7 @@ class ReportController extends Controller
                 'id' => $id,
                 'reasons' => $reasons,
                 'model_type' => 'App\\Models\\' . ucfirst($type),
+                'content_info' => $contentInfo,
             ]
         ]);
     }

@@ -37,7 +37,7 @@
                 <!-- Paylaşımlar Grid -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
                     @foreach($posts as $post)
-                        <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 p-6 border border-gray-100 hover:border-rose-200 relative flex flex-col h-full">
+                        <div id="post-{{ $post->id }}" class="bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 p-6 border border-gray-100 hover:border-rose-200 relative flex flex-col h-full">
                             <!-- Kullanıcı Bilgisi -->
                             <div class="flex items-center justify-between mb-4">
                                 <div class="flex items-center">
@@ -109,8 +109,51 @@
                                 @endif
                             </div>
 
+                                                <!-- Beğeni ve Yorum Butonları -->
+                    <div class="mt-4 pt-3 border-t border-gray-100">
+                        <div class="flex items-center justify-between">
+                            @auth
+                            <!-- Beğeni Butonu -->
+                            <button onclick="toggleLike({{ $post->id }})" 
+                                    id="like-btn-{{ $post->id }}"
+                                    class="flex items-center space-x-2 px-3 py-2 rounded-lg transition-all duration-200 hover:bg-gray-50"
+                                    data-liked="{{ $post->isLikedByUser(auth()->id()) ? 'true' : 'false' }}">
+                                <svg id="like-icon-{{ $post->id }}" class="w-5 h-5 transition-colors duration-200 {{ $post->isLikedByUser(auth()->id()) ? 'text-red-500 fill-current' : 'text-gray-400' }}" 
+                                     fill="{{ $post->isLikedByUser(auth()->id()) ? 'currentColor' : 'none' }}" 
+                                     stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                                </svg>
+                                <span id="like-count-{{ $post->id }}" class="text-sm font-medium text-gray-600">
+                                    {{ $post->like_count ?: 'Beğen' }}
+                                </span>
+                            </button>
+                            @else
+                            <!-- Giriş Yapmamış Kullanıcılar İçin Beğeni -->
+                            <div class="flex items-center space-x-2 px-3 py-2">
+                                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                                </svg>
+                                <span class="text-sm font-medium text-gray-600">
+                                    {{ $post->like_count ?: '0' }}
+                                </span>
+                            </div>
+                            @endauth
+                            
+                            <!-- Yorum Butonu - Herkese Açık -->
+                            <button onclick="openCommentsModal({{ $post->id }})" 
+                                    class="flex items-center space-x-2 px-3 py-2 rounded-lg transition-all duration-200 hover:bg-gray-50">
+                                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-3.582 8-8 8a9.863 9.863 0 01-4.906-1.289L3 21l1.289-5.094A9.863 9.863 0 713 12c0-4.418 3.582-8 8-8s8 3.582 8 8z"></path>
+                                </svg>
+                                <span id="comment-count-{{ $post->id }}" class="text-sm font-medium text-gray-600">
+                                    {{ $post->comment_count ? $post->comment_count . ' Yorum' : 'Yorumları Gör' }}
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+
                             <!-- Alt Bilgiler -->
-                            <div class="flex items-center justify-between pt-4 border-t border-gray-100 mt-auto">
+                            <div class="flex items-center justify-between pt-4 {{ auth()->check() ? 'border-t border-gray-100' : '' }} mt-auto">
                                 <div class="flex items-center space-x-3">
                                     <!-- Tarih -->
                                     <p class="text-xs text-gray-400">
@@ -167,6 +210,9 @@
 
     <!-- Report Modal Component -->
     <x-report-modal />
+    
+    <!-- Comments Modal Component -->
+    <x-comments-modal />
 
     <!-- Edit Modal -->
     <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
@@ -301,12 +347,12 @@
                         // Focus textarea
                         document.getElementById('editContent').focus();
                     } else {
-                        alert('❌ ' + data.message);
+                        showModernToast(data.message, 'error');
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    alert('❌ Bir hata oluştu. Lütfen tekrar deneyin.');
+                    showModernToast('Bir hata oluştu. Lütfen tekrar deneyin.', 'error');
                 });
         }
 
@@ -339,16 +385,16 @@
             .then(data => {
                 if (data.success) {
                     closeEditModal();
-                    alert('✅ ' + data.message);
+                    showModernToast(data.message, 'success');
                     // Sayfayı yenile
                     location.reload();
                 } else {
-                    alert('❌ ' + (data.message || 'Bir hata oluştu.'));
+                    showModernToast(data.message || 'Bir hata oluştu.', 'error');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('❌ Bir hata oluştu. Lütfen tekrar deneyin.');
+                showModernToast('Bir hata oluştu. Lütfen tekrar deneyin.', 'error');
             });
         }
 
@@ -390,16 +436,16 @@
             .then(data => {
                 if (data.success) {
                     closeDeleteModal();
-                    alert('🗑️ ' + data.message);
+                    showModernToast(data.message, 'success');
                     // Sayfayı yenile
                     location.reload();
                 } else {
-                    alert('❌ ' + (data.message || 'Bir hata oluştu.'));
+                    showModernToast(data.message || 'Bir hata oluştu.', 'error');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('❌ Bir hata oluştu. Lütfen tekrar deneyin.');
+                showModernToast('Bir hata oluştu. Lütfen tekrar deneyin.', 'error');
             });
         }
 
@@ -453,7 +499,544 @@
             if (event.key === 'Escape') {
                 closeEditModal();
                 closeDeleteModal();
+                closeCommentsModal();
             }
         });
+        
+        // Modal fonksiyonları (home.blade.php'den kopyalandı)
+        function loadModalComments(postId) {
+            const commentsList = document.getElementById('modalCommentsList');
+            const commentCount = document.getElementById('modalCommentCount');
+            
+            commentsList.innerHTML = '<div class="text-center py-8"><div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-rose-500"></div><p class="mt-2 text-gray-500">Yorumlar yükleniyor...</p></div>';
+            
+            fetch(`/posts/${postId}/comments`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    displayModalComments(data.comments);
+                    commentCount.textContent = data.comments.length;
+                } else {
+                    commentsList.innerHTML = '<div class="text-center py-8 text-gray-500">Yorumlar yüklenirken hata oluştu.</div>';
+                }
+            })
+            .catch(error => {
+                console.error('Load comments error:', error);
+                commentsList.innerHTML = '<div class="text-center py-8 text-gray-500">Yorumlar yüklenirken hata oluştu.</div>';
+            });
+        }
+        
+        function displayModalComments(comments) {
+            const commentsList = document.getElementById('modalCommentsList');
+            
+            if (comments.length === 0) {
+                commentsList.innerHTML = '<div class="text-center py-8 text-gray-500"><svg class="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-3.582 8-8 8a9.863 9.863 0 01-4.906-1.289L3 21l1.289-5.094A9.863 9.863 0 013 12c0-4.418 3.582-8 8-8s8 3.582 8 8z"></path></svg><h4 class="text-lg font-medium text-gray-600 mb-2">Henüz yorum yok</h4><p class="text-gray-500">İlk yorumu siz yapın!</p></div>';
+                return;
+            }
+            
+            let html = '';
+            comments.forEach(comment => {
+                html += createModalCommentHTML(comment);
+            });
+            
+            commentsList.innerHTML = html;
+        }
+        
+        function createModalCommentHTML(comment) {
+            return `
+                <div class="flex items-start space-x-3" id="modal-comment-${comment.id}">
+                    <img class="w-10 h-10 rounded-full border-2 border-gray-200" src="${comment.user_photo}" alt="${comment.user_name}">
+                    <div class="flex-1">
+                        <div class="bg-gray-50 rounded-xl px-4 py-3">
+                            <div class="flex items-center justify-between mb-1">
+                                <h6 class="font-semibold text-sm text-gray-900">${comment.user_name}</h6>
+                                <span class="text-xs text-gray-500">${comment.created_at}</span>
+                            </div>
+                            <p class="text-sm text-gray-700 leading-relaxed">${comment.content}</p>
+                        </div>
+                        <div class="flex items-center space-x-4 mt-2 text-xs">
+                            ${comment.is_owner ? `
+                                <button onclick="editModalComment(${comment.id})" class="text-blue-600 hover:text-blue-800 font-medium">Düzenle</button>
+                                <button onclick="deleteModalComment(${comment.id})" class="text-red-600 hover:text-red-800 font-medium">Sil</button>
+                            ` : `
+                                <button onclick="reportComment(${comment.id})" class="text-orange-600 hover:text-orange-800 font-medium">
+                                    <svg class="w-3 h-3 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 18.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                                    </svg>
+                                    Bildir
+                                </button>
+                            `}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        /**
+         * Yorumu bildir
+         */
+        function reportComment(commentId) {
+            @auth
+                openReportModal('comment', commentId);
+            @else
+                if (confirm('Yorum bildirmek için giriş yapmanız gerekiyor. Giriş sayfasına yönlendirilsin mi?')) {
+                    window.location.href = '/login';
+                }
+            @endauth
+        }
+
+        function submitModalComment(event) {
+            event.preventDefault();
+            
+            const form = event.target;
+            const formData = new FormData(form);
+            const postId = formData.get('post_id');
+            const content = formData.get('content').trim();
+            
+            if (!content || content.length < 2) {
+                showToast('❌ Lütfen en az 2 karakter yorum yazın.', 'error');
+                return;
+            }
+            
+            const submitBtn = document.getElementById('modalCommentSubmit');
+            const submitText = document.getElementById('modalSubmitText');
+            const submitLoader = document.getElementById('modalSubmitLoader');
+            
+            submitBtn.disabled = true;
+            submitText.textContent = 'Gönderiliyor...';
+            submitLoader.classList.remove('hidden');
+            
+            const token = csrfToken;
+            fetch(`/posts/${postId}/comments`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': token,
+                    'Accept': 'application/json'
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    form.reset();
+                    updateModalCharCount();
+                    
+                    if (data.status === 'approved') {
+                        const commentsList = document.getElementById('modalCommentsList');
+                        if (commentsList.innerHTML.includes('Henüz yorum yok')) {
+                            commentsList.innerHTML = '';
+                        }
+                        
+                        const newCommentHTML = createModalCommentHTML(data.comment);
+                        commentsList.insertAdjacentHTML('afterbegin', newCommentHTML);
+                        
+                        const modalCount = document.getElementById('modalCommentCount');
+                        const pageCount = document.getElementById(`comment-count-${postId}`);
+                        modalCount.textContent = data.comment_count;
+                        pageCount.textContent = data.comment_count > 0 ? data.comment_count : 'Yorum Yap';
+                        
+                        showToast('✅ Yorumunuz başarıyla eklendi!', 'success');
+                    } else if (data.status === 'suspicious') {
+                        showToast('⚠️ Yorumunuz eklendi ancak moderasyon bekliyor.', 'warning');
+                    } else {
+                        showToast('❌ Yorumunuz spam olarak algılandı.', 'error');
+                    }
+                } else {
+                    showToast('❌ ' + (data.message || 'Bir hata oluştu.'), 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Submit comment error:', error);
+                showToast('❌ Bir hata oluştu. Lütfen tekrar deneyin.', 'error');
+            })
+            .finally(() => {
+                submitBtn.disabled = false;
+                submitText.textContent = 'Gönder';
+                submitLoader.classList.add('hidden');
+            });
+        }
+        
+        function updateModalCharCount() {
+            const textarea = document.getElementById('modalCommentContent');
+            const charCount = document.getElementById('modalCharCount');
+            
+            if (textarea && charCount) {
+                const currentLength = textarea.value.length;
+                charCount.textContent = currentLength;
+                
+                if (currentLength > 450) {
+                    charCount.style.color = '#ef4444';
+                } else if (currentLength > 400) {
+                    charCount.style.color = '#f59e0b';
+                } else {
+                    charCount.style.color = '#6b7280';
+                }
+            }
+        }
+        
+        function editModalComment(commentId) {
+            const newContent = prompt('Yorumunuzu düzenleyin:');
+            if (!newContent || newContent.trim().length < 2) return;
+            
+            const token = csrfToken;
+            fetch(`/comments/${commentId}`, {
+                method: 'PUT',
+                headers: {
+                    'X-CSRF-TOKEN': token,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ content: newContent.trim() })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast('✅ Yorumunuz güncellendi!', 'success');
+                    const postId = document.getElementById('modalPostId').value;
+                    loadModalComments(postId);
+                } else {
+                    showToast('❌ ' + (data.message || 'Bir hata oluştu.'), 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Edit comment error:', error);
+                showToast('❌ Bir hata oluştu.', 'error');
+            });
+        }
+        
+        function deleteModalComment(commentId) {
+            if (!confirm('Bu yorumu silmek istediğinizden emin misiniz?')) return;
+            
+            const token = csrfToken;
+            fetch(`/comments/${commentId}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': token,
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast('🗑️ Yorumunuz silindi!', 'success');
+                    
+                    const commentElement = document.getElementById(`modal-comment-${commentId}`);
+                    if (commentElement) {
+                        commentElement.remove();
+                    }
+                    
+                    const modalCount = document.getElementById('modalCommentCount');
+                    const postId = document.getElementById('modalPostId').value;
+                    const pageCount = document.getElementById(`comment-count-${postId}`);
+                    
+                    const newCount = parseInt(modalCount.textContent) - 1;
+                    modalCount.textContent = newCount;
+                    pageCount.textContent = newCount > 0 ? newCount : 'Yorum Yap';
+                    
+                    const commentsList = document.getElementById('modalCommentsList');
+                    if (commentsList.children.length === 0) {
+                        commentsList.innerHTML = '<div class="text-center py-8 text-gray-500"><svg class="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-3.582 8-8 8a9.863 9.863 0 01-4.906-1.289L3 21l1.289-5.094A9.863 9.863 0 013 12c0-4.418 3.582-8 8-8s8 3.582 8 8z"></path></svg><h4 class="text-lg font-medium text-gray-600 mb-2">Henüz yorum yok</h4><p class="text-gray-500">İlk yorumu siz yapın!</p></div>';
+                    }
+                } else {
+                    showToast('❌ ' + (data.message || 'Bir hata oluştu.'), 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Delete comment error:', error);
+                showToast('❌ Bir hata oluştu.', 'error');
+            });
+        }
+        
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            const modalTextarea = document.getElementById('modalCommentContent');
+            if (modalTextarea) {
+                modalTextarea.addEventListener('input', updateModalCharCount);
+                modalTextarea.addEventListener('keydown', function(event) {
+                    if (event.key === 'Enter' && !event.shiftKey) {
+                        event.preventDefault();
+                        document.getElementById('modalCommentForm').dispatchEvent(new Event('submit'));
+                    }
+                });
+            }
+        });
+        
+        document.addEventListener('click', function(event) {
+            const modal = document.getElementById('commentsModal');
+            if (event.target === modal) {
+                closeCommentsModal();
+            }
+        });
+
+        // ===================
+        // BEĞENİ FONKSİYONLARI
+        // ===================
+        
+        function toggleLike(postId) {
+            const token = csrfToken;
+            const likeBtn = document.getElementById(`like-btn-${postId}`);
+            const likeIcon = document.getElementById(`like-icon-${postId}`);
+            const likeCount = document.getElementById(`like-count-${postId}`);
+            
+            likeBtn.disabled = true;
+            likeBtn.style.opacity = '0.7';
+            
+            fetch(`/posts/${postId}/like`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': token,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const isLiked = data.is_liked;
+                    likeBtn.setAttribute('data-liked', isLiked ? 'true' : 'false');
+                    
+                    if (isLiked) {
+                        likeIcon.classList.remove('text-gray-400');
+                        likeIcon.classList.add('text-red-500', 'fill-current');
+                        likeIcon.setAttribute('fill', 'currentColor');
+                        likeCount.textContent = data.like_count > 0 ? data.formatted_count : 'Beğenildi';
+                    } else {
+                        likeIcon.classList.remove('text-red-500', 'fill-current');
+                        likeIcon.classList.add('text-gray-400');
+                        likeIcon.setAttribute('fill', 'none');
+                        likeCount.textContent = data.like_count > 0 ? data.formatted_count : 'Beğen';
+                    }
+                } else {
+                    showModernToast(data.message || 'Bir hata oluştu.', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Like error:', error);
+                showModernToast('Bir hata oluştu.', 'error');
+            })
+            .finally(() => {
+                likeBtn.disabled = false;
+                likeBtn.style.opacity = '1';
+            });
+        }
+
+        // ===================
+        // YORUM FONKSİYONLARI
+        // ===================
+        
+        function openCommentsModal(postId) {
+            const modal = document.getElementById('commentsModal');
+            const postIdInput = document.getElementById('modalPostId');
+            
+            if (!modal) {
+                showModernToast('Modal component yüklenmedi. Sayfa yeniden yüklenecek.', 'error');
+                location.reload();
+                return;
+            }
+            
+            if (postIdInput) {
+                postIdInput.value = postId;
+            }
+            
+            modal.classList.remove('hidden');
+            modal.classList.add('flex', 'show');
+            document.body.style.overflow = 'hidden';
+            
+            loadModalComments(postId);
+        }
+        
+        function closeCommentsModal() {
+            const modal = document.getElementById('commentsModal');
+            const form = document.getElementById('modalCommentForm');
+            
+            modal.classList.add('hidden');
+            modal.classList.remove('flex', 'show');
+            document.body.style.overflow = 'auto';
+            
+            if (form) {
+                form.reset();
+                updateModalCharCount();
+            }
+        }
+        
+        function loadComments(postId) {
+            const commentsList = document.getElementById(`comments-list-${postId}`);
+            commentsList.innerHTML = '<div class="text-center py-4"><div class="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-rose-500"></div><span class="ml-2 text-gray-500">Yorumlar yükleniyor...</span></div>';
+            
+            fetch(`/posts/${postId}/comments`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    displayComments(postId, data.comments);
+                } else {
+                    commentsList.innerHTML = '<div class="text-center py-4 text-gray-500">Yorumlar yüklenirken hata oluştu.</div>';
+                }
+            })
+            .catch(error => {
+                console.error('Load comments error:', error);
+                commentsList.innerHTML = '<div class="text-center py-4 text-gray-500">Yorumlar yüklenirken hata oluştu.</div>';
+            });
+        }
+        
+        function displayComments(postId, comments) {
+            const commentsList = document.getElementById(`comments-list-${postId}`);
+            
+            if (comments.length === 0) {
+                commentsList.innerHTML = '<div class="text-center py-4 text-gray-500">Henüz yorum yapılmamış. İlk yorumu siz yapın!</div>';
+                return;
+            }
+            
+            let html = '';
+            comments.forEach(comment => {
+                html += createCommentHTML(comment);
+            });
+            
+            commentsList.innerHTML = html;
+        }
+        
+        function createCommentHTML(comment) {
+            return `
+                <div class="flex items-start space-x-3" id="comment-${comment.id}">
+                    <img class="w-8 h-8 rounded-full" src="${comment.user_photo}" alt="${comment.user_name}">
+                    <div class="flex-1">
+                        <div class="bg-gray-50 rounded-lg px-3 py-2">
+                            <div class="flex items-center justify-between mb-1">
+                                <h6 class="font-medium text-sm text-gray-900">${comment.user_name}</h6>
+                                <span class="text-xs text-gray-500">${comment.created_at}</span>
+                            </div>
+                            <p class="text-sm text-gray-700">${comment.content}</p>
+                        </div>
+                        ${comment.is_owner ? `
+                        <div class="flex items-center space-x-3 mt-1 text-xs">
+                            <button onclick="editComment(${comment.id})" class="text-blue-600 hover:text-blue-800">Düzenle</button>
+                            <button onclick="deleteComment(${comment.id})" class="text-red-600 hover:text-red-800">Sil</button>
+                        </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }
+        
+        function submitComment(event, postId) {
+            event.preventDefault();
+            
+            const form = event.target;
+            const formData = new FormData(form);
+            const content = formData.get('content').trim();
+            
+            if (!content || content.length < 2) {
+                showModernToast('Lütfen en az 2 karakter yorum yazın.', 'error');
+                return;
+            }
+            
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Gönderiliyor...';
+            
+            const token = csrfToken;
+            fetch(`/posts/${postId}/comments`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': token,
+                    'Accept': 'application/json'
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    form.reset();
+                    
+                    if (data.status === 'approved') {
+                        const commentsList = document.getElementById(`comments-list-${postId}`);
+                        if (commentsList.innerHTML.includes('Henüz yorum yapılmamış')) {
+                            commentsList.innerHTML = '';
+                        }
+                        const newCommentHTML = createCommentHTML(data.comment);
+                        commentsList.insertAdjacentHTML('afterbegin', newCommentHTML);
+                        const commentCount = document.getElementById(`comment-count-${postId}`);
+                        commentCount.textContent = data.comment_count > 0 ? data.comment_count : 'Yorum Yap';
+                        showToast('✅ Yorumunuz eklendi!', 'success');
+                    } else if (data.status === 'suspicious') {
+                        showToast('⚠️ Yorumunuz moderasyon bekliyor.', 'warning');
+                    } else {
+                        showToast('❌ Yorumunuz spam olarak algılandı.', 'error');
+                    }
+                } else {
+                    showToast('❌ ' + (data.message || 'Bir hata oluştu.'), 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Submit comment error:', error);
+                showToast('❌ Bir hata oluştu.', 'error');
+            })
+            .finally(() => {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+            });
+        }
+        
+        function showToast(message, type = 'info') {
+            showModernToast(message, type);
+        }
+
+        function editComment(commentId) {
+            const newContent = prompt('Yorumunuzu düzenleyin:');
+            if (!newContent || newContent.trim().length < 2) return;
+            
+            const token = csrfToken;
+            fetch(`/comments/${commentId}`, {
+                method: 'PUT',
+                headers: {
+                    'X-CSRF-TOKEN': token,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ content: newContent.trim() })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast('✅ Yorumunuz güncellendi!', 'success');
+                    location.reload();
+                } else {
+                    showToast('❌ ' + (data.message || 'Hata oluştu.'), 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Edit comment error:', error);
+                showToast('❌ Bir hata oluştu.', 'error');
+            });
+        }
+
+        function deleteComment(commentId) {
+            if (!confirm('Bu yorumu silmek istediğinizden emin misiniz?')) return;
+            
+            const token = csrfToken;
+            fetch(`/comments/${commentId}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': token,
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast('🗑️ Yorumunuz silindi!', 'success');
+                    const commentElement = document.getElementById(`comment-${commentId}`);
+                    if (commentElement) {
+                        commentElement.remove();
+                    }
+                } else {
+                    showToast('❌ ' + (data.message || 'Hata oluştu.'), 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Delete comment error:', error);
+                showToast('❌ Bir hata oluştu.', 'error');
+            });
+        }
     </script>
 </x-app-layout> 

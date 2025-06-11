@@ -5,7 +5,43 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+        <!-- SEO Meta Tags -->
+        <title>{{ \App\Models\SiteSetting::get('seo_title', 'Vezirköprü Hemşehrileri - Samsun Vezirköprü İlçesi Sosyal Platform') }}</title>
+        <meta name="description" content="{{ \App\Models\SiteSetting::get('seo_description', 'Vezirköprü ilçesinde yaşayan, Vezirköprü\'den olan ve Vezirköprü\'ye gönül vermiş herkesin buluşma noktası. Samsun\'un bu güzel ilçesinden haberler, etkinlikler, iş ilanları ve sosyal paylaşımlar.') }}">
+        <meta name="keywords" content="{{ \App\Models\SiteSetting::get('seo_keywords', 'Vezirköprü, Samsun Vezirköprü, Vezirköprü haber, Vezirköprü sosyal medya, Vezirköprü WhatsApp, Vezirköprü hemşehri, Vezirköprü iş ilanları, Vezirköprü etkinlik') }}">
+        <meta name="author" content="Vezirköprü Hemşehrileri">
+        <meta name="robots" content="index, follow">
+        <link rel="canonical" href="{{ url()->current() }}">
+
+        <!-- Open Graph / Facebook -->
+        <meta property="og:type" content="website">
+        <meta property="og:title" content="{{ \App\Models\SiteSetting::get('seo_title', 'Vezirköprü Hemşehrileri - Samsun Vezirköprü İlçesi Sosyal Platform') }}">
+        <meta property="og:description" content="{{ \App\Models\SiteSetting::get('seo_description', 'Vezirköprü ilçesinde yaşayan, Vezirköprü\'den olan ve Vezirköprü\'ye gönül vermiş herkesin buluşma noktası.') }}">
+        <meta property="og:url" content="{{ url()->current() }}">
+        <meta property="og:site_name" content="Vezirköprü Hemşehrileri">
+        <meta property="og:locale" content="tr_TR">
+
+        <!-- Twitter -->
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:title" content="{{ \App\Models\SiteSetting::get('seo_title', 'Vezirköprü Hemşehrileri - Samsun Vezirköprü İlçesi Sosyal Platform') }}">
+        <meta name="twitter:description" content="{{ \App\Models\SiteSetting::get('seo_description', 'Vezirköprü ilçesinde yaşayan, Vezirköprü\'den olan ve Vezirköprü\'ye gönül vermiş herkesin buluşma noktası.') }}">
+
+        <!-- Geographic meta tags -->
+        <meta name="geo.region" content="TR-55">
+        <meta name="geo.placename" content="Vezirköprü, Samsun, Türkiye">
+        <meta name="geo.position" content="41.1461;35.4586">
+        <meta name="ICBM" content="41.1461, 35.4586">
+
+        <!-- Google Analytics -->
+        @if(\App\Models\SiteSetting::get('google_analytics_id'))
+        <script async src="https://www.googletagmanager.com/gtag/js?id={{ \App\Models\SiteSetting::get('google_analytics_id') }}"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '{{ \App\Models\SiteSetting::get('google_analytics_id') }}');
+        </script>
+        @endif
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
@@ -209,10 +245,6 @@
             @endauth
         </div>
 
-
-
-
-
         <!-- İletişim Modal -->
         <div id="contactModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
             <div class="bg-white rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
@@ -358,19 +390,19 @@
                     
                     if (response.ok) {
                         // Başarılı
-                        alert('Mesajınız başarıyla gönderildi! En kısa sürede size dönüş yapacağız.');
+                        showModernToast('✉️ Mesajınız başarıyla gönderildi! En kısa sürede size dönüş yapacağız.', 'success');
                         closeContactModal();
                     } else {
                         // Hata
                         if (result.errors && result.errors.recaptcha_token) {
-                            alert('Güvenlik doğrulaması başarısız. Lütfen tekrar deneyin.');
+                            showModernToast('🔒 Güvenlik doğrulaması başarısız. Lütfen tekrar deneyin.', 'error');
                         } else {
-                            alert('Mesaj gönderilirken bir hata oluştu. Lütfen tekrar deneyin.');
+                            showModernToast('❌ Mesaj gönderilirken bir hata oluştu. Lütfen tekrar deneyin.', 'error');
                         }
                     }
                 } catch (error) {
                     console.error('Error:', error);
-                    alert('Bir hata oluştu. Lütfen tekrar deneyin.');
+                    showModernToast('❌ Bir hata oluştu. Lütfen tekrar deneyin.', 'error');
                 } finally {
                     // Buton durumunu eski haline getir
                     submitButton.disabled = false;
@@ -378,6 +410,90 @@
                 }
             }
 
+            // Global Modern Toast Notification System
+            window.showModernToast = function(message, type = 'info', duration = 4000) {
+                // Toast container oluştur (yoksa)
+                let toastContainer = document.getElementById('toast-container');
+                if (!toastContainer) {
+                    toastContainer = document.createElement('div');
+                    toastContainer.id = 'toast-container';
+                    toastContainer.className = 'fixed top-4 right-4 z-[9999] space-y-2';
+                    document.body.appendChild(toastContainer);
+                }
+                
+                // Toast element oluştur
+                const toast = document.createElement('div');
+                toast.className = `transform transition-all duration-300 ease-in-out translate-x-full opacity-0`;
+                
+                // Tip'e göre renk ve ikon belirle
+                let bgColor, textColor, icon;
+                switch(type) {
+                    case 'success':
+                        bgColor = 'bg-green-500';
+                        textColor = 'text-white';
+                        icon = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>`;
+                        break;
+                    case 'error':
+                        bgColor = 'bg-red-500';
+                        textColor = 'text-white';
+                        icon = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>`;
+                        break;
+                    case 'warning':
+                        bgColor = 'bg-yellow-500';
+                        textColor = 'text-white';
+                        icon = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                        </svg>`;
+                        break;
+                    case 'info':
+                    default:
+                        bgColor = 'bg-blue-500';
+                        textColor = 'text-white';
+                        icon = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>`;
+                        break;
+                }
+                
+                toast.innerHTML = `
+                    <div class="${bgColor} ${textColor} px-6 py-4 rounded-lg shadow-lg flex items-center space-x-3 min-w-[320px] max-w-md">
+                        <div class="flex-shrink-0">
+                            ${icon}
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-sm font-medium">${message}</p>
+                        </div>
+                        <button onclick="this.parentElement.parentElement.remove()" class="flex-shrink-0 opacity-70 hover:opacity-100 transition-opacity">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                `;
+                
+                // Toast'ı container'a ekle
+                toastContainer.appendChild(toast);
+                
+                // Animasyonlu gösterim
+                requestAnimationFrame(() => {
+                    toast.classList.remove('translate-x-full', 'opacity-0');
+                    toast.classList.add('translate-x-0', 'opacity-100');
+                });
+                
+                // Otomatik kaldırma
+                setTimeout(() => {
+                    toast.classList.add('translate-x-full', 'opacity-0');
+                    setTimeout(() => {
+                        if (toast.parentElement) {
+                            toast.parentElement.removeChild(toast);
+                        }
+                    }, 300);
+                }, duration);
+            }
 
         </script>
     </body>

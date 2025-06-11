@@ -37,6 +37,7 @@ class ReportManagementController extends Controller
             'reviewed' => Report::where('status', 'reviewed')->count(),
             'resolved' => Report::where('status', 'resolved')->count(),
             'dismissed' => Report::where('status', 'dismissed')->count(),
+            'unread' => Report::whereNull('viewed_at')->count(),
         ];
 
         return view('admin.reports.index', compact('reports', 'stats'));
@@ -48,6 +49,11 @@ class ReportManagementController extends Controller
     public function show(Report $report)
     {
         $report->load(['reporter', 'reviewer', 'reportable']);
+        
+        // Bildiri detayına bakıldığını işaretle
+        if (!$report->viewed_at) {
+            $report->update(['viewed_at' => now()]);
+        }
         
         return view('admin.reports.show', compact('report'));
     }

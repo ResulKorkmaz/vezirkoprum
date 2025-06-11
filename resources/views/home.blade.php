@@ -295,6 +295,96 @@
                         </div>
                     @endforeach
                 </div>
+
+                <!-- İkinci Satır - 4., 5., 6. Paylaşım -->
+                @if($posts->skip(3)->count() > 0)
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        @foreach($posts->skip(3)->take(3) as $post)
+                            <div class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 relative flex flex-col h-full">
+                                <!-- Kullanıcı Bilgisi -->
+                                <div class="flex items-center justify-between mb-4">
+                                    <div class="flex items-center">
+                                        <img class="w-12 h-12 rounded-full object-cover border-2 border-rose-200" 
+                                             src="{{ $post->user->getVisibleProfilePhotoUrl(auth()->user()) }}" 
+                                             alt="{{ $post->user->name }}"
+                                             onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQ4IiBoZWlnaHQ9IjQ4IiByeD0iMjQiIGZpbGw9IiNCNzZFNzkiLz4KPHN2ZyB4PSIxMiIgeT0iMTAiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIj4KPHBhdGggZD0iTTEyIDEyQzE0LjIwOTEgMTIgMTYgMTAuMjA5MSAxNiA4QzE2IDUuNzkwODYgMTQuMjA5MSA0IDEyIDRDOS43OTA4NiA0IDggNS43OTA4NiA4IDhDOCAxMC4yMDkxIDkuNzkwODYgMTIgMTIgMTJaIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNMTIgMTRDOC4xMzQwMSAxNCA1IDE3LjEzNDAxIDUgMjFIMTlDMTkgMTcuMTM0MDEgMTUuODY2IDE0IDEyIDE0WiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+Cjwvc3ZnPgo='">
+                                        <div class="ml-3">
+                                            <h4 class="font-bold text-gray-900">{{ $post->user->getDisplayNameWithIdForUser(auth()->user()) }}</h4>
+                                            @if($post->user->profession)
+                                                <p class="text-sm text-gray-500">{{ $post->user->display_profession }}</p>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- 3 Nokta Menü -->
+                                    @auth
+                                        <div class="relative">
+                                            <button onclick="togglePostMenu({{ $post->id }})" class="p-2 rounded-full transition-all duration-200 transform hover:scale-110 hover:shadow-md" style="color: #B76E79; background-color: rgba(183, 110, 121, 0.1);" onmouseover="this.style.backgroundColor='rgba(183, 110, 121, 0.2)'" onmouseout="this.style.backgroundColor='rgba(183, 110, 121, 0.1)'">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01"></path>
+                                                </svg>
+                                            </button>
+                                            <div id="post-menu-{{ $post->id }}" class="hidden absolute right-0 top-8 bg-white rounded-lg shadow-lg border border-gray-200 py-1 min-w-32 z-10">
+                                                @if(auth()->id() === $post->user_id)
+                                                    <!-- Kendi Postları İçin -->
+                                                    <button onclick="openEditModal({{ $post->id }})" class="w-full text-left px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 flex items-center">
+                                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                                        </svg>
+                                                        Düzenle
+                                                    </button>
+                                                    <button onclick="openDeleteModal({{ $post->id }})" class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center">
+                                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                                        </svg>
+                                                        Sil
+                                                    </button>
+                                                @else
+                                                    <!-- Başkalarının Postları İçin -->
+                                                    <button onclick="openReportModal('post', {{ $post->id }})" class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center">
+                                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 18.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                                                        </svg>
+                                                        Postu Bildir
+                                                    </button>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    @endauth
+                                </div>
+                                
+                                <!-- Paylaşım İçeriği -->
+                                <div class="text-gray-600 text-sm leading-relaxed flex-1">
+                                    <p id="post-content-{{ $post->id }}">
+                                        "{{ Str::limit($post->content, 120) }}"
+                                    </p>
+                                    @if(strlen($post->content) > 120)
+                                        <button onclick="togglePostContent({{ $post->id }}, {{ json_encode($post->content) }})" 
+                                                id="post-toggle-{{ $post->id }}"
+                                                class="mt-2 text-sm font-semibold transition-colors duration-200 hover:underline" 
+                                                style="color: #B76E79;"
+                                                onmouseover="this.style.color='#A85D68'" 
+                                                onmouseout="this.style.color='#B76E79'">
+                                            Devamını Gör
+                                        </button>
+                                    @endif
+                                </div>
+                                
+                                <!-- Alt Bilgi -->
+                                <div class="mt-auto pt-4 border-t border-gray-100">
+                                    @if($post->user->current_city)
+                                        <p class="text-xs text-gray-400">
+                                            {{ $post->user->current_city }}{{ $post->user->current_district ? ', ' . $post->user->current_district : '' }}
+                                        </p>
+                                    @endif
+                                    <p class="text-xs text-gray-400 mt-1">
+                                        {{ $post->created_at->diffForHumans() }}
+                                    </p>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
             @else
                 <!-- Paylaşım yoksa varsayılan içerik -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -403,95 +493,7 @@
                 </div>
             </div>
 
-                <!-- İkinci Satır - 4., 5., 6. Paylaşım -->
-                @if($posts->count() > 3)
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        @foreach($posts->skip(3)->take(3) as $post)
-                            <div class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 relative flex flex-col h-full">
-                                <!-- Kullanıcı Bilgisi -->
-                                <div class="flex items-center justify-between mb-4">
-                                    <div class="flex items-center">
-                                        <img class="w-12 h-12 rounded-full object-cover border-2 border-rose-200" 
-                                             src="{{ $post->user->getVisibleProfilePhotoUrl(auth()->user()) }}" 
-                                             alt="{{ $post->user->name }}"
-                                             onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQ4IiBoZWlnaHQ9IjQ4IiByeD0iMjQiIGZpbGw9IiNCNzZFNzkiLz4KPHN2ZyB4PSIxMiIgeT0iMTAiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIj4KPHBhdGggZD0iTTEyIDEyQzE0LjIwOTEgMTIgMTYgMTAuMjA5MSAxNiA4QzE2IDUuNzkwODYgMTQuMjA5MSA0IDEyIDRDOS43OTA4NiA0IDggNS43OTA4NiA4IDhDOCAxMC4yMDkxIDkuNzkwODYgMTIgMTIgMTJaIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNMTIgMTRDOC4xMzQwMSAxNCA1IDE3LjEzNDAxIDUgMjFIMTlDMTkgMTcuMTM0MDEgMTUuODY2IDE0IDEyIDE0WiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+Cjwvc3ZnPgo='">
-                                        <div class="ml-3">
-                                            <h4 class="font-bold text-gray-900">{{ $post->user->getDisplayNameWithIdForUser(auth()->user()) }}</h4>
-                                            @if($post->user->profession)
-                                                <p class="text-sm text-gray-500">{{ $post->user->display_profession }}</p>
-                                            @endif
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- 3 Nokta Menü -->
-                                    @auth
-                                        <div class="relative">
-                                            <button onclick="togglePostMenu({{ $post->id }})" class="p-2 rounded-full transition-all duration-200 transform hover:scale-110 hover:shadow-md" style="color: #B76E79; background-color: rgba(183, 110, 121, 0.1);" onmouseover="this.style.backgroundColor='rgba(183, 110, 121, 0.2)'" onmouseout="this.style.backgroundColor='rgba(183, 110, 121, 0.1)'">
-                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01"></path>
-                                                </svg>
-                                            </button>
-                                            <div id="post-menu-{{ $post->id }}" class="hidden absolute right-0 top-8 bg-white rounded-lg shadow-lg border border-gray-200 py-1 min-w-32 z-10">
-                                                @if(auth()->id() === $post->user_id)
-                                                    <!-- Kendi Postları İçin -->
-                                                    <button onclick="openEditModal({{ $post->id }})" class="w-full text-left px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 flex items-center">
-                                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                                                        </svg>
-                                                        Düzenle
-                                                    </button>
-                                                    <button onclick="openDeleteModal({{ $post->id }})" class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center">
-                                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                                        </svg>
-                                                        Sil
-                                                    </button>
-                                                @else
-                                                    <!-- Başkalarının Postları İçin -->
-                                                    <button onclick="openReportModal('post', {{ $post->id }})" class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center">
-                                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 18.5c-.77.833.192 2.5 1.732 2.5z"></path>
-                                                        </svg>
-                                                        Postu Bildir
-                                                    </button>
-                                                @endif
-                                            </div>
-                                        </div>
-                                    @endauth
-                                </div>
-                                
-                                <!-- Paylaşım İçeriği -->
-                                <div class="text-gray-600 text-sm leading-relaxed flex-1">
-                                    <p id="post-content-{{ $post->id }}">
-                                        "{{ Str::limit($post->content, 120) }}"
-                                    </p>
-                                    @if(strlen($post->content) > 120)
-                                        <button onclick="togglePostContent({{ $post->id }}, {{ json_encode($post->content) }})" 
-                                                id="post-toggle-{{ $post->id }}"
-                                                class="mt-2 text-sm font-semibold transition-colors duration-200 hover:underline" 
-                                                style="color: #B76E79;"
-                                                onmouseover="this.style.color='#A85D68'" 
-                                                onmouseout="this.style.color='#B76E79'">
-                                            Devamını Gör
-                                        </button>
-                                    @endif
-                                </div>
-                                
-                                <!-- Alt Bilgi -->
-                                <div class="mt-auto pt-4 border-t border-gray-100">
-                                    @if($post->user->current_city)
-                                        <p class="text-xs text-gray-400">
-                                            {{ $post->user->current_city }}{{ $post->user->current_district ? ', ' . $post->user->current_district : '' }}
-                                        </p>
-                                    @endif
-                                    <p class="text-xs text-gray-400 mt-1">
-                                        {{ $post->created_at->diffForHumans() }}
-                                    </p>
-                                </div>
-                            </div>
-                        @endforeach
-                                    </div>
-                 @endif
+
                  
                  <!-- Tüm Paylaşımları Gör Butonu -->
                  @if($posts && $posts->count() > 0)

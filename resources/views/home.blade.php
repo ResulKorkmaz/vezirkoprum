@@ -517,7 +517,12 @@
                             @endif
                         </h3>
                         @if(!$hasFilters)
-                            <a href="{{ route('home') }}?show_all=1" class="font-semibold text-sm transition-colors duration-200" style="color: #B76E79;" onmouseover="this.style.color='#A85D68'" onmouseout="this.style.color='#B76E79'">
+                            <a href="{{ route('home') }}?show_all=1#hemşehriler" 
+                               class="font-semibold text-sm transition-colors duration-200" 
+                               style="color: #B76E79;" 
+                               onmouseover="this.style.color='#A85D68'" 
+                               onmouseout="this.style.color='#B76E79'"
+                               onclick="setTimeout(() => { document.getElementById('hemşehriler').scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 100);">
                                 Tümünü Gör →
                             </a>
                         @endif
@@ -1683,5 +1688,21 @@
                 showToast('❌ Bir hata oluştu.', 'error');
             });
         }
+
+        // Sayfa yüklendiğinde show_all parametresi varsa hemşehriler bölümüne scroll yap
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('show_all')) {
+                setTimeout(() => {
+                    const hemsehrilerSection = document.getElementById('hemşehriler');
+                    if (hemsehrilerSection) {
+                        hemsehrilerSection.scrollIntoView({ 
+                            behavior: 'smooth', 
+                            block: 'start' 
+                        });
+                    }
+                }, 500); // Sayfa tamamen yüklendikten sonra scroll yap
+            }
+        });
     </script>
 </x-app-layout>

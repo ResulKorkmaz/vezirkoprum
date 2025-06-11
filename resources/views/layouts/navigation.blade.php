@@ -5,10 +5,10 @@
         <!-- Logo -->
             <div class="flex items-center">
                 <a href="{{ route('home') }}" class="flex items-center space-x-4 group">
-                    <div class="w-14 h-14 bg-gradient-to-br from-rose-50 to-pink-50 border border-rose-100 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105 overflow-hidden">
+                    <div class="w-14 h-14 border rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105 overflow-hidden" style="background: linear-gradient(to bottom right, rgba(183, 110, 121, 0.1), rgba(183, 110, 121, 0.05)); border-color: rgba(183, 110, 121, 0.2);">
                         <img src="{{ asset('images/logo.png') }}" alt="Vezirköprüm Logo" class="w-11 h-11 object-contain">
                     </div>
-                    <span class="text-2xl font-black text-rose-700 tracking-tight hover:text-rose-800 transition-colors duration-200">
+                    <span class="text-2xl font-black tracking-tight transition-colors duration-200" style="color: #B76E79;" onmouseover="this.style.color='#A85D68'" onmouseout="this.style.color='#B76E79'">
                         Vezirköprüm
                     </span>
                 </a>
@@ -18,7 +18,10 @@
             <div class="hidden md:flex items-center space-x-1">
                 <!-- Ana Sayfa -->
                 <a href="{{ route('home') }}" 
-                   class="px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 {{ request()->routeIs('home') ? 'bg-rose-50 text-rose-700 shadow-sm' : 'text-gray-700 hover:text-rose-600 hover:bg-gray-50' }}">
+                   class="px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 {{ request()->routeIs('home') ? 'shadow-sm' : 'text-gray-700 hover:bg-gray-50' }}"
+                   style="{{ request()->routeIs('home') ? 'background-color: rgba(183, 110, 121, 0.1); color: #B76E79;' : '' }}"
+                   onmouseover="if (!this.classList.contains('shadow-sm')) { this.style.color='#B76E79'; }"
+                   onmouseout="if (!this.classList.contains('shadow-sm')) { this.style.color='#374151'; }">
                     <svg class="w-4 h-4 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
                     </svg>
@@ -28,7 +31,10 @@
                 @auth
                     <!-- Mesajlar -->
                     <a href="{{ route('messages.index') }}" 
-                       class="px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 relative {{ request()->routeIs('messages.*') ? 'bg-rose-50 text-rose-700 shadow-sm' : 'text-gray-700 hover:text-rose-600 hover:bg-gray-50' }}">
+                       class="px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 relative {{ request()->routeIs('messages.*') ? 'shadow-sm' : 'text-gray-700 hover:bg-gray-50' }}"
+                       style="{{ request()->routeIs('messages.*') ? 'background-color: rgba(183, 110, 121, 0.1); color: #B76E79;' : '' }}"
+                       onmouseover="if (!this.classList.contains('shadow-sm')) { this.style.color='#B76E79'; }"
+                       onmouseout="if (!this.classList.contains('shadow-sm')) { this.style.color='#374151'; }">
                         <svg class="w-4 h-4 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
                         </svg>
@@ -42,7 +48,10 @@
 
                     <!-- WhatsApp Grupları -->
                     <a href="{{ route('whatsapp.index') }}" 
-                       class="px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 {{ request()->routeIs('whatsapp.*') ? 'bg-rose-50 text-rose-700 shadow-sm' : 'text-gray-700 hover:text-rose-600 hover:bg-gray-50' }}">
+                       class="px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 {{ request()->routeIs('whatsapp.*') ? 'shadow-sm' : 'text-gray-700 hover:bg-gray-50' }}"
+                       style="{{ request()->routeIs('whatsapp.*') ? 'background-color: rgba(183, 110, 121, 0.1); color: #B76E79;' : '' }}"
+                       onmouseover="if (!this.classList.contains('shadow-sm')) { this.style.color='#B76E79'; }"
+                       onmouseout="if (!this.classList.contains('shadow-sm')) { this.style.color='#374151'; }">
                         <svg class="w-4 h-4 inline-block mr-2" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488"/>
                         </svg>
@@ -55,9 +64,12 @@
                     <!-- User Dropdown -->
                     <div class="relative" x-data="{ open: false }">
                         <button @click="open = !open" 
-                                class="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-gray-50 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-offset-2">
+                                class="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-gray-50 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2"
+                                style="focus:ring-color: #B76E79;"
+                                onmouseover="this.style.backgroundColor='rgba(183, 110, 121, 0.05)'"
+                                onmouseout="this.style.backgroundColor='rgba(249, 250, 251, 1)'"
                                 <!-- User Avatar -->
-                            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-rose-500 to-pink-600 flex items-center justify-center shadow-md">
+                            <div class="w-8 h-8 rounded-full flex items-center justify-center shadow-md" style="background: linear-gradient(to bottom right, #B76E79, #A85D68);">
                                     @if(auth()->user()->profile_photo)
                                         <img src="{{ auth()->user()->getVisibleProfilePhotoUrl(auth()->user()) }}" 
                                              alt="{{ auth()->user()->name }}" 
@@ -95,7 +107,9 @@
                             <!-- Menu Items -->
                             <div class="py-2">
                                 <a href="{{ route('profile.edit') }}" 
-                                   class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-rose-50 hover:text-rose-700 transition-colors duration-200">
+                                   class="flex items-center px-4 py-2 text-sm text-gray-700 transition-colors duration-200"
+                                   onmouseover="this.style.backgroundColor='rgba(183, 110, 121, 0.1)'; this.style.color='#B76E79';"
+                                   onmouseout="this.style.backgroundColor='transparent'; this.style.color='#374151';">
                                     <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                                     </svg>
@@ -103,7 +117,9 @@
                                 </a>
                                 
                                 <a href="{{ route('profile.show', auth()->user()) }}" 
-                                   class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-rose-50 hover:text-rose-700 transition-colors duration-200">
+                                   class="flex items-center px-4 py-2 text-sm text-gray-700 transition-colors duration-200"
+                                   onmouseover="this.style.backgroundColor='rgba(183, 110, 121, 0.1)'; this.style.color='#B76E79';"
+                                   onmouseout="this.style.backgroundColor='transparent'; this.style.color='#374151';">
                                     <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
@@ -139,14 +155,19 @@
                 @else
                     <!-- Guest Links -->
                     <a href="{{ route('login') }}" 
-                       class="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 hover:text-rose-600 hover:bg-gray-50 transition-all duration-200">
+                       class="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-all duration-200"
+                       onmouseover="this.style.color='#B76E79';"
+                       onmouseout="this.style.color='#374151';">
                         <svg class="w-4 h-4 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
                         </svg>
                         Giriş Yap
                     </a>
                     <a href="{{ route('register') }}" 
-                       class="ml-3 px-6 py-2 bg-gradient-to-r from-rose-600 to-pink-600 text-white text-sm font-medium rounded-lg hover:from-rose-700 hover:to-pink-700 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl">
+                       class="ml-3 px-6 py-2 text-white text-sm font-medium rounded-lg transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl"
+                       style="background: linear-gradient(to right, #B76E79, #A85D68);"
+                       onmouseover="this.style.background='linear-gradient(to right, #A85D68, #9A5460)'"
+                       onmouseout="this.style.background='linear-gradient(to right, #B76E79, #A85D68)'"
                         <svg class="w-4 h-4 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
                         </svg>
@@ -158,7 +179,10 @@
             <!-- Mobile menu button -->
             <div class="md:hidden">
                 <button @click="mobileMenuOpen = !mobileMenuOpen" 
-                        class="p-2 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-rose-500">
+                        class="p-2 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors duration-200 focus:outline-none focus:ring-2"
+                        style="focus:ring-color: #B76E79;"
+                        onmouseover="this.style.color='#B76E79';"
+                        onmouseout="this.style.color='#6B7280';">
                     <svg class="w-6 h-6" :class="{ 'hidden': mobileMenuOpen }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                     </svg>
@@ -182,7 +206,10 @@
             <div class="px-2 pt-2 pb-3 space-y-1">
                 <!-- Ana Sayfa -->
                 <a href="{{ route('home') }}" 
-                   class="block px-3 py-2 rounded-lg text-base font-medium {{ request()->routeIs('home') ? 'bg-rose-50 text-rose-700' : 'text-gray-700 hover:text-rose-600 hover:bg-gray-50' }} transition-colors duration-200">
+                   class="block px-3 py-2 rounded-lg text-base font-medium {{ request()->routeIs('home') ? '' : 'text-gray-700 hover:bg-gray-50' }} transition-colors duration-200"
+                   style="{{ request()->routeIs('home') ? 'background-color: rgba(183, 110, 121, 0.1); color: #B76E79;' : '' }}"
+                   onmouseover="if (!'{{ request()->routeIs('home') }}') { this.style.color='#B76E79'; }"
+                   onmouseout="if (!'{{ request()->routeIs('home') }}') { this.style.color='#374151'; }">
                     <svg class="w-5 h-5 inline-block mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
                     </svg>
@@ -192,7 +219,10 @@
                 @auth
                     <!-- Mesajlar -->
                     <a href="{{ route('messages.index') }}" 
-                       class="block px-3 py-2 rounded-lg text-base font-medium {{ request()->routeIs('messages.*') ? 'bg-rose-50 text-rose-700' : 'text-gray-700 hover:text-rose-600 hover:bg-gray-50' }} transition-colors duration-200 relative">
+                       class="block px-3 py-2 rounded-lg text-base font-medium {{ request()->routeIs('messages.*') ? '' : 'text-gray-700 hover:bg-gray-50' }} transition-colors duration-200 relative"
+                       style="{{ request()->routeIs('messages.*') ? 'background-color: rgba(183, 110, 121, 0.1); color: #B76E79;' : '' }}"
+                       onmouseover="if (!'{{ request()->routeIs('messages.*') }}') { this.style.color='#B76E79'; }"
+                       onmouseout="if (!'{{ request()->routeIs('messages.*') }}') { this.style.color='#374151'; }">
                         <svg class="w-5 h-5 inline-block mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
                         </svg>
@@ -206,7 +236,10 @@
 
                     <!-- WhatsApp Grupları -->
                     <a href="{{ route('whatsapp.index') }}" 
-                       class="block px-3 py-2 rounded-lg text-base font-medium {{ request()->routeIs('whatsapp.*') ? 'bg-rose-50 text-rose-700' : 'text-gray-700 hover:text-rose-600 hover:bg-gray-50' }} transition-colors duration-200">
+                       class="block px-3 py-2 rounded-lg text-base font-medium {{ request()->routeIs('whatsapp.*') ? '' : 'text-gray-700 hover:bg-gray-50' }} transition-colors duration-200"
+                       style="{{ request()->routeIs('whatsapp.*') ? 'background-color: rgba(183, 110, 121, 0.1); color: #B76E79;' : '' }}"
+                       onmouseover="if (!'{{ request()->routeIs('whatsapp.*') }}') { this.style.color='#B76E79'; }"
+                       onmouseout="if (!'{{ request()->routeIs('whatsapp.*') }}') { this.style.color='#374151'; }">
                         <svg class="w-5 h-5 inline-block mr-3" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488"/>
                         </svg>
@@ -216,7 +249,7 @@
                     <!-- User Section -->
                     <div class="border-t border-gray-100 mt-4 pt-4">
                         <div class="flex items-center px-3 py-2 mb-2">
-                            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-rose-500 to-pink-600 flex items-center justify-center shadow-md mr-3">
+                            <div class="w-10 h-10 rounded-full flex items-center justify-center shadow-md mr-3" style="background: linear-gradient(to bottom right, #B76E79, #A85D68);">
                                 @if(auth()->user()->profile_photo)
                                     <img src="{{ auth()->user()->getVisibleProfilePhotoUrl(auth()->user()) }}" 
                                          alt="{{ auth()->user()->name }}" 
@@ -232,7 +265,9 @@
                         </div>
 
                         <a href="{{ route('profile.edit') }}" 
-                           class="block px-3 py-2 rounded-lg text-base font-medium text-gray-700 hover:text-rose-600 hover:bg-gray-50 transition-colors duration-200">
+                           class="block px-3 py-2 rounded-lg text-base font-medium text-gray-700 hover:bg-gray-50 transition-colors duration-200"
+                           onmouseover="this.style.color='#B76E79';"
+                           onmouseout="this.style.color='#374151';">
                             <svg class="w-5 h-5 inline-block mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                             </svg>
@@ -240,7 +275,9 @@
                         </a>
 
                         <a href="{{ route('profile.show', auth()->user()) }}" 
-                           class="block px-3 py-2 rounded-lg text-base font-medium text-gray-700 hover:text-rose-600 hover:bg-gray-50 transition-colors duration-200">
+                           class="block px-3 py-2 rounded-lg text-base font-medium text-gray-700 hover:bg-gray-50 transition-colors duration-200"
+                           onmouseover="this.style.color='#B76E79';"
+                           onmouseout="this.style.color='#374151';">
                             <svg class="w-5 h-5 inline-block mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
@@ -273,14 +310,19 @@
                     <!-- Guest Links -->
                     <div class="border-t border-gray-100 mt-4 pt-4 space-y-2">
                         <a href="{{ route('login') }}" 
-                           class="block px-3 py-2 rounded-lg text-base font-medium text-gray-700 hover:text-rose-600 hover:bg-gray-50 transition-colors duration-200">
+                           class="block px-3 py-2 rounded-lg text-base font-medium text-gray-700 hover:bg-gray-50 transition-colors duration-200"
+                           onmouseover="this.style.color='#B76E79';"
+                           onmouseout="this.style.color='#374151';">
                             <svg class="w-5 h-5 inline-block mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
                             </svg>
                             Giriş Yap
                         </a>
                         <a href="{{ route('register') }}" 
-                           class="block px-3 py-2 bg-gradient-to-r from-rose-600 to-pink-600 text-white text-base font-medium rounded-lg text-center transition-all duration-200">
+                           class="block px-3 py-2 text-white text-base font-medium rounded-lg text-center transition-all duration-200"
+                           style="background: linear-gradient(to right, #B76E79, #A85D68);"
+                           onmouseover="this.style.background='linear-gradient(to right, #A85D68, #9A5460)'"
+                           onmouseout="this.style.background='linear-gradient(to right, #B76E79, #A85D68)'"
                             <svg class="w-5 h-5 inline-block mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
                             </svg>

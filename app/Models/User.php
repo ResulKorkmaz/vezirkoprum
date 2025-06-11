@@ -295,6 +295,12 @@ class User extends Authenticatable
             return self::where('email', $identifier)->first();
         }
         
+        // Kullanıcı adı (unique_user_id) ile ara
+        $userByUsername = self::where('unique_user_id', $identifier)->first();
+        if ($userByUsername) {
+            return $userByUsername;
+        }
+        
         // Telefon numarası olarak ara
         return self::findByPhone($identifier);
     }

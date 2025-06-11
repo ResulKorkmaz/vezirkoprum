@@ -194,7 +194,7 @@
                                 </td>
                                 <td class="px-6 py-4">
                                     <div class="text-sm text-gray-900 max-w-xs">
-                                        {{ Str::limit($post->content, 100) }}
+                                        {{ \Str::limit($post->content, 100) }}
                                     </div>
                                     @if($post->image)
                                         <div class="mt-1">

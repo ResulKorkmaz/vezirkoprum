@@ -2,6 +2,17 @@
     <!-- Modern Hero Section -->
     <section class="relative bg-gradient-to-br from-[#B76E79]/5 via-white to-[#B76E79]/10 min-h-[600px] flex items-center overflow-hidden">
         <style>
+            /* Smooth scroll optimizasyonu */
+            html {
+                scroll-behavior: smooth;
+                scroll-padding-top: 80px;
+            }
+            
+            /* Performans için will-change */
+            #hemşehriler {
+                will-change: scroll-position;
+            }
+            
             @media (min-width: 1024px) {
                 .hero-flex-container {
                     flex-wrap: nowrap !important;
@@ -1694,25 +1705,62 @@
             if (urlParams.has('show_all')) {
                 const hemsehrilerSection = document.getElementById('hemşehriler');
                 if (hemsehrilerSection) {
-                    // Sayfanın en üstüne git, sonra smooth scroll yap
-                    window.scrollTo(0, 0);
-                    setTimeout(() => {
-                        hemsehrilerSection.scrollIntoView({ 
-                            behavior: 'smooth', 
-                            block: 'start' 
-                        });
-                    }, 500);
+                    // Performanslı scroll için requestAnimationFrame kullan
+                    requestAnimationFrame(() => {
+                        // Offset hesapla (header yüksekliği için)
+                        const headerOffset = 100;
+                        const elementPosition = hemsehrilerSection.getBoundingClientRect().top;
+                        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+                        
+                        // Smooth scroll with easing
+                        const startPosition = window.pageYOffset;
+                        const distance = offsetPosition - startPosition;
+                        const duration = 800; // 800ms
+                        let start = null;
+                        
+                        function animation(currentTime) {
+                            if (start === null) start = currentTime;
+                            const timeElapsed = currentTime - start;
+                            const run = ease(timeElapsed, startPosition, distance, duration);
+                            window.scrollTo(0, run);
+                            if (timeElapsed < duration) requestAnimationFrame(animation);
+                        }
+                        
+                        // Easing function for smooth animation
+                        function ease(t, b, c, d) {
+                            t /= d / 2;
+                            if (t < 1) return c / 2 * t * t + b;
+                            t--;
+                            return -c / 2 * (t * (t - 2) - 1) + b;
+                        }
+                        
+                        requestAnimationFrame(animation);
+                    });
                 }
             }
         }
 
-        // Birden fazla event ile dene
-        document.addEventListener('DOMContentLoaded', scrollToHemsehriler);
-        window.addEventListener('load', scrollToHemsehriler);
+        // Sayfa tamamen yüklendiğinde çalıştır
+        let scrollExecuted = false;
         
-        // Eğer sayfa zaten yüklenmişse hemen çalıştır
-        if (document.readyState === 'complete') {
-            scrollToHemsehriler();
+        function executeScroll() {
+            if (!scrollExecuted) {
+                scrollExecuted = true;
+                setTimeout(scrollToHemsehriler, 200);
+            }
         }
+        
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', executeScroll);
+        } else {
+            executeScroll();
+        }
+        
+        // Ek güvenlik için window load event'i
+        window.addEventListener('load', () => {
+            if (!scrollExecuted) {
+                executeScroll();
+            }
+        });
     </script>
 </x-app-layout>
